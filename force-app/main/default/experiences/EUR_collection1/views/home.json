@@ -1,0 +1,113 @@
+{
+  "appPageId" : "e89e029e-290f-4105-bc08-19288c951e43",
+  "componentName" : "community_layout:sldsFlexibleLayout",
+  "dataProviders" : [ ],
+  "label" : "Home",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "backgroundImageConfig" : "",
+        "backgroundImageOverlay" : "rgba(0,0,0,0)",
+        "dxpStyle" : { },
+        "sectionConfig" : "{\"UUID\":\"0aa16cdd-144f-4c9a-8dd1-c23d65427241\",\"columns\":[{\"UUID\":\"0de85d27-38fe-4159-9e20-41e672405899\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"4\",\"seedComponents\":[]},{\"UUID\":\"14b2d615-50ad-4136-99fc-24f4cf721721\",\"columnName\":\"Column 2\",\"columnKey\":\"5acc7\",\"columnWidth\":\"4\",\"seedComponents\":[]},{\"UUID\":\"5809e24f-5855-416c-aa52-42467d4bb53d\",\"columnName\":\"Column 3\",\"columnKey\":\"3486d\",\"columnWidth\":\"4\",\"seedComponents\":[]}]}"
+      },
+      "componentName" : "community_layout:section",
+      "id" : "0aa16cdd-144f-4c9a-8dd1-c23d65427241",
+      "regions" : [ {
+        "id" : "0de85d27-38fe-4159-9e20-41e672405899",
+        "regionLabel" : "Column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : {
+            "dxpStyle" : { },
+            "richTextValue" : "<p>Select a Building from the list to create an EUR</p>"
+          },
+          "componentName" : "community_builder:richTextEditor",
+          "id" : "0b5f2489-6b89-4837-8177-839cc43ae374",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "14b2d615-50ad-4136-99fc-24f4cf721721",
+        "regionLabel" : "Column 2",
+        "regionName" : "5acc7",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "id" : "5809e24f-5855-416c-aa52-42467d4bb53d",
+        "regionLabel" : "Column 3",
+        "regionName" : "3486d",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "scopedBrandingSetId" : null,
+      "type" : "component"
+    }, {
+      "componentAttributes" : {
+        "backgroundImageConfig" : "",
+        "backgroundImageOverlay" : "rgba(0,0,0,0)",
+        "dxpStyle" : { },
+        "sectionConfig" : "{\"UUID\":\"0aec623f-3443-41c1-a586-ab28b4e4c68a\",\"columns\":[{\"UUID\":\"99274ae8-b6fc-445c-816f-ebdf8cf4ea49\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"12\",\"seedComponents\":null}]}"
+      },
+      "componentName" : "community_layout:section",
+      "id" : "0aec623f-3443-41c1-a586-ab28b4e4c68a",
+      "regions" : [ {
+        "components" : [ {
+          "componentAttributes" : {
+            "dxpStyle" : {
+              "margin" : {
+                "bottom" : "50px",
+                "left" : "50px",
+                "right" : "50px",
+                "top" : "50px"
+              }
+            },
+            "flowName" : "{\"flowName\":\"NZC_Create_EUR_for_Stationary\",\"flowLabel\":\"NZC - Create EUR for Stationary\"}"
+          },
+          "componentName" : "dxp_flow:flow",
+          "id" : "dddf33de-12c7-4e94-acfa-4d30d22b0574",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "99274ae8-b6fc-445c-816f-ebdf8cf4ea49",
+        "regionLabel" : "Column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "scopedBrandingSetId" : "30dff689-1efe-4e70-84d8-aa780454b9a2",
+      "type" : "component"
+    } ],
+    "id" : "e045cd9d-b27d-453f-90b2-66a7acd7c4cd",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "dxpStyle" : { },
+        "pageTitle" : "Home",
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "community_builder:seoAssistant",
+      "id" : "566802d2-b028-4487-aba9-b3201ddb0908",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "47f8503f-a3b6-45bf-ac65-a38f67070956",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "viewType" : "home"
+}

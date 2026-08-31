@@ -1,0 +1,78 @@
+{
+  "appPageId" : "e89e029e-290f-4105-bc08-19288c951e43",
+  "componentName" : "community_layout:sldsFlexibleLayout",
+  "dataProviders" : [ ],
+  "label" : "EUR-lwc",
+  "regions" : [ {
+    "components" : [ {
+      "componentAttributes" : {
+        "backgroundImageConfig" : "",
+        "backgroundImageOverlay" : "rgba(0,0,0,0)",
+        "componentSpacerSize" : "",
+        "layoutDirectionDesktop" : "row",
+        "layoutDirectionMobile" : "column",
+        "layoutDirectionTablet" : "column",
+        "maxContentWidth" : "",
+        "sectionColumnGutterWidth" : "",
+        "sectionConfig" : "{\"UUID\":\"baad602e-da97-4687-a1bc-507bda2ea19b\",\"columns\":[{\"UUID\":\"3334213e-b312-41bf-9664-c5c10f63134d\",\"columnName\":\"Column 1\",\"columnKey\":\"col1\",\"columnWidth\":\"3\",\"seedComponents\":[]},{\"UUID\":\"0d54e490-1e28-4c1a-82f1-01afe5690515\",\"columnName\":\"Column 2\",\"columnKey\":\"3f6c0\",\"columnWidth\":\"6\",\"seedComponents\":[]},{\"UUID\":\"4c76bd54-d146-4152-a75a-e41d9747bc0c\",\"columnName\":\"Column 3\",\"columnKey\":\"589d1\",\"columnWidth\":\"3\",\"seedComponents\":[]}]}",
+        "sectionMinHeight" : "",
+        "sectionVerticalAlign" : "flex-start"
+      },
+      "componentName" : "community_layout:section",
+      "id" : "baad602e-da97-4687-a1bc-507bda2ea19b",
+      "regions" : [ {
+        "id" : "3334213e-b312-41bf-9664-c5c10f63134d",
+        "regionLabel" : "Column 1",
+        "regionName" : "col1",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "components" : [ {
+          "componentAttributes" : { },
+          "componentName" : "c:billIngestorGuest",
+          "id" : "2cdc3a33-1c2f-4465-bca1-11717e9eecf0",
+          "renderPriority" : "NEUTRAL",
+          "renditionMap" : { },
+          "type" : "component"
+        } ],
+        "id" : "0d54e490-1e28-4c1a-82f1-01afe5690515",
+        "regionLabel" : "Column 2",
+        "regionName" : "3f6c0",
+        "renditionMap" : { },
+        "type" : "region"
+      }, {
+        "id" : "4c76bd54-d146-4152-a75a-e41d9747bc0c",
+        "regionLabel" : "Column 3",
+        "regionName" : "589d1",
+        "renditionMap" : { },
+        "type" : "region"
+      } ],
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "scopedBrandingSetId" : null,
+      "type" : "component"
+    } ],
+    "id" : "54a1be57-2001-442d-b661-de28c51b2b9d",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "pageTitle" : "EUR-lwc",
+        "recordId" : "{!recordId}"
+      },
+      "componentName" : "community_builder:seoAssistant",
+      "id" : "210eafa7-9e97-46b7-945b-2812813d190d",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "1f05d109-0790-463f-90ef-c8c6790eb270",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "viewType" : "custom-eur-lwc"
+}

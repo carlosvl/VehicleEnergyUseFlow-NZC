@@ -1,0 +1,10 @@
+{
+  "activeViewId" : "71965fd1-a88e-4b50-a316-85902862a26a",
+  "appPageId" : "e89e029e-290f-4105-bc08-19288c951e43",
+  "configurationTags" : [ ],
+  "devName" : "EUR_lwc__c",
+  "label" : "EUR-lwc",
+  "pageAccess" : "UseParent",
+  "routeType" : "custom-eur-lwc",
+  "urlPrefix" : "eur-lwc"
+}
