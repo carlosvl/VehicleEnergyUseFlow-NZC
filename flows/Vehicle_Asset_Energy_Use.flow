@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <apiVersion>56.0</apiVersion>
+    <apiVersion>64.0</apiVersion>
+    <description>Captures vehicle fuel and energy use for a Vehicle Asset Emission Source and creates a Vehicle Asset Energy Use record.</description>
     <dynamicChoiceSets>
         <name>FuelConsumptionUnitPL</name>
         <dataType>Picklist</dataType>

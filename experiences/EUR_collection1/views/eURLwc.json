@@ -28,8 +28,11 @@
         "type" : "region"
       }, {
         "components" : [ {
-          "componentAttributes" : { },
-          "componentName" : "c:billIngestorGuest",
+          "componentAttributes" : {
+            "dxpStyle" : { },
+            "flowName" : "{\"flowName\":\"Vehicle_Asset_Energy_Use\",\"flowLabel\":\"Vehicle Asset Energy Use\"}"
+          },
+          "componentName" : "dxp_flow:flow",
           "id" : "2cdc3a33-1c2f-4465-bca1-11717e9eecf0",
           "renderPriority" : "NEUTRAL",
           "renditionMap" : { },

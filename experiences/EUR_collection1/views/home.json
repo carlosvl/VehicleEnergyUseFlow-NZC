@@ -23,7 +23,7 @@
         "components" : [ {
           "componentAttributes" : {
             "dxpStyle" : { },
-            "richTextValue" : "<p>Select a Building from the list to create an EUR</p>"
+            "richTextValue" : "<p>Select a Vehicle Asset Emission Source to create an Energy Use Record</p>"
           },
           "componentName" : "community_builder:richTextEditor",
           "id" : "0b5f2489-6b89-4837-8177-839cc43ae374",
@@ -67,7 +67,7 @@
                 "top" : "50px"
               }
             },
-            "flowName" : "{\"flowName\":\"NZC_Create_EUR_for_Stationary\",\"flowLabel\":\"NZC - Create EUR for Stationary\"}"
+            "flowName" : "{\"flowName\":\"Vehicle_Asset_Energy_Use\",\"flowLabel\":\"Vehicle Asset Energy Use\"}"
           },
           "componentName" : "dxp_flow:flow",
           "id" : "dddf33de-12c7-4e94-acfa-4d30d22b0574",
