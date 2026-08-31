@@ -1,0 +1,47 @@
+{
+  "project": "VehicleEnergyUseFlow-NZC",
+  "license": "Apache-2.0",
+  "generated": "2026-08-31",
+  "runtime": [
+    {
+      "name": "Salesforce Platform",
+      "kind": "platform",
+      "required": true,
+      "deployedWithThisRepo": false
+    },
+    {
+      "name": "Net Zero Cloud",
+      "kind": "salesforce-managed-package",
+      "namespace": "sustainability",
+      "required": true,
+      "deployedWithThisRepo": false
+    },
+    {
+      "name": "Experience Cloud",
+      "kind": "platform-feature",
+      "required": false,
+      "notes": "Required only to deploy Network / ExperienceBundle / NetworkBranding",
+      "deployedWithThisRepo": false
+    }
+  ],
+  "devDependencies": [
+    { "name": "eslint", "version": "^8.11.0" },
+    { "name": "@lwc/eslint-plugin-lwc", "version": "^1.1.2" },
+    { "name": "@salesforce/eslint-config-lwc", "version": "^3.2.3" },
+    { "name": "@salesforce/eslint-plugin-aura", "version": "^2.0.0" },
+    { "name": "@salesforce/eslint-plugin-lightning", "version": "^1.0.0" },
+    { "name": "@salesforce/sfdx-lwc-jest", "version": "^1.1.0" },
+    { "name": "prettier", "version": "^2.6.0" },
+    { "name": "prettier-plugin-apex", "version": "^1.10.0" },
+    { "name": "@prettier/plugin-xml", "version": "^2.0.1" },
+    { "name": "husky", "version": "^7.0.4" },
+    { "name": "lint-staged", "version": "^12.3.7" },
+    { "name": "eslint-plugin-import", "version": "^2.25.4" },
+    { "name": "eslint-plugin-jest", "version": "^26.1.2" }
+  ],
+  "notIncluded": [
+    "c:billIngestorGuest",
+    "NZC_Create_EUR_for_Stationary",
+    "sustainability__CollectEnergyUseData"
+  ]
+}

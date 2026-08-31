@@ -127,6 +127,7 @@ After deploying with any method above, complete these manual steps:
 3. **Enable and Publish Digital Experiences**
    - Setup → **Digital Experiences** → **Settings** → enable Digital Experiences if needed
    - Open **Experience Workspaces** for **EUR collection**
+   - Set the site **email sender** to a verified address in your org (source uses a placeholder)
    - Assign member profiles that exist in your org (the retrieved network includes Admin and a partner profile named `nzc partner user`, which you may need to create or replace)
    - **Publish** the site
 
@@ -134,9 +135,9 @@ After deploying with any method above, complete these manual steps:
    - Give community or partner users Read on Vehicle Asset Emission Source
    - Give Create and Read on Vehicle Asset Energy Use, including field-level access for fuel, date, and emissions factor fields
 
-5. **Review Experience Cloud Page Targets**
-   - The site **Home** page currently embeds the flow `NZC_Create_EUR_for_Stationary`, which is **not** in this package. Point that component at `Vehicle_Asset_Energy_Use` for vehicle capture, or deploy the stationary flow separately
-   - The **EUR-lwc** page (`/eur-lwc`) references the `billIngestorGuest` Lightning web component from the companion [NZC LLM Bill Ingestor](https://github.com/carlosvl/NZC-LLM-Bill-Ingestor) accelerator. Deploy that package if you want bill upload on the site; otherwise remove or replace the component
+5. **Verify the Site Flows**
+   - Home and **EUR-lwc** (`/eur-lwc`) both run `Vehicle_Asset_Energy_Use`
+   - Optionally add the companion [NZC LLM Bill Ingestor](https://github.com/carlosvl/NZC-LLM-Bill-Ingestor) if you want bill upload
    - Follow the [Usage instructions](#-usage) below to capture your first vehicle energy use record
 
 ---
@@ -155,7 +156,7 @@ After deploying with any method above, complete these manual steps:
 
 1. **Share** the EUR collection site URL with partner or community users
 2. **Sign in** as a user whose profile is a member of the site
-3. **Complete** the energy-use flow on Home, or use the **EUR-lwc** page if the bill ingestor component is installed
+3. **Complete** the **Vehicle Asset Energy Use** flow on Home or on the **EUR-lwc** page
 4. **Confirm** the new Vehicle Asset Energy Use record in Salesforce
 
 ### 📊 **What Gets Created**
@@ -216,11 +217,13 @@ We welcome contributions to improve Vehicle Asset Energy Use (NZC)! Please follo
 4. **Push** to the branch (`git push origin feature/amazing-feature`)
 5. **Open** a Pull Request
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide, including the Salesforce CLA. This project follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 ### 📝 **Development Guidelines**
 
 - Follow [Salesforce coding standards](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_best_practices.htm)
 - Include comprehensive test coverage (>75%) for any Apex you add
-- Update documentation for new features
+- Update documentation for new features (`README.md`, `wiki/index.md`, `REPOSITORY_SUMMARY.md`)
 - Test thoroughly in multiple org types (Sandbox, Developer Edition)
 - Keep Experience Cloud page components aligned with metadata that actually ships in this package
 
@@ -228,7 +231,7 @@ We welcome contributions to improve Vehicle Asset Energy Use (NZC)! Please follo
 
 ## 📄 License
 
-This project is licensed under the **Apache License 2.0** - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the **Apache License 2.0** - see [LICENSE.md](LICENSE.md) and [LICENSE.txt](LICENSE.txt) for details.
 
 ---
 
@@ -246,9 +249,10 @@ When reporting bugs, please include:
 
 ## 🆘 Support
 
-- 📚 **Documentation**: Check our [Wiki](https://github.com/carlosvl/VehicleEnergyUseFlow-NZC/wiki) for detailed guides
+- 📚 **Documentation**: Start with [wiki/index.md](wiki/index.md) and [REPOSITORY_SUMMARY.md](REPOSITORY_SUMMARY.md)
 - 🐛 **Issues**: Report bugs via [GitHub Issues](https://github.com/carlosvl/VehicleEnergyUseFlow-NZC/issues)
-- 💬 **Discussions**: Join the conversation in [GitHub Discussions](https://github.com/carlosvl/VehicleEnergyUseFlow-NZC/discussions)
+- 🔒 **Security**: Report vulnerabilities via [SECURITY.md](SECURITY.md)
+- 🤝 **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
 - 📧 **Contact**: Reach out to the maintainers for enterprise support
 
 ## ⚠️ Disclaimer

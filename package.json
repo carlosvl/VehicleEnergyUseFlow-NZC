@@ -1,8 +1,9 @@
 {
-  "name": "salesforce-app",
+  "name": "vehicle-energy-use-flow-nzc",
   "private": true,
   "version": "1.0.0",
-  "description": "Salesforce App",
+  "license": "Apache-2.0",
+  "description": "Net Zero Cloud accelerator for vehicle asset energy use capture",
   "scripts": {
     "lint": "eslint **/{aura,lwc}/**",
     "test": "npm run test:unit",
