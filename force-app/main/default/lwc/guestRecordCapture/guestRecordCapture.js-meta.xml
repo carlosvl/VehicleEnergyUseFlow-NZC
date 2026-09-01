@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Guest Record Capture</masterLabel>
+    <description>Guest Experience Cloud capture form driven by Guest Capture Config custom metadata.</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property
+                name="configName"
+                type="String"
+                default="Vehicle_Energy_Use"
+                label="Capture Config Developer Name"
+                description="Developer name of the Guest Capture Config custom metadata record. The client may pass only this name."
+            />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

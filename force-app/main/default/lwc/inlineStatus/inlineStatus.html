@@ -1,0 +1,11 @@
+<template>
+    <div if:true={hasMessage} class={notificationClass} role={alertRole}>
+        <div class="slds-media__figure">
+            <lightning-icon icon-name={iconName} alternative-text={assistiveText} size="small">
+            </lightning-icon>
+        </div>
+        <div class="slds-media__body">
+            <p>{message}</p>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,89 @@
+<template>
+    <form class="slds-form slds-form_stacked" onsubmit={handleSubmit}>
+        <template for:each={fieldModels} for:item="field">
+            <div key={field.apiName} class="slds-m-bottom_small">
+                <template if:true={field.isBoolean}>
+                    <lightning-input
+                        type="checkbox"
+                        name={field.apiName}
+                        label={field.label}
+                        checked={field.booleanValue}
+                        required={field.required}
+                        disabled={disabled}
+                        data-api-name={field.apiName}
+                        data-field-type={field.type}
+                        onchange={handleFieldChange}
+                    >
+                    </lightning-input>
+                </template>
+                <template if:true={field.isPicklist}>
+                    <lightning-combobox
+                        name={field.apiName}
+                        label={field.label}
+                        value={field.displayValue}
+                        options={field.comboboxOptions}
+                        required={field.required}
+                        disabled={disabled}
+                        data-api-name={field.apiName}
+                        data-field-type={field.type}
+                        onchange={handleFieldChange}
+                    >
+                    </lightning-combobox>
+                </template>
+                <template if:true={field.isTextarea}>
+                    <lightning-textarea
+                        name={field.apiName}
+                        label={field.label}
+                        value={field.displayValue}
+                        required={field.required}
+                        disabled={disabled}
+                        data-api-name={field.apiName}
+                        data-field-type={field.type}
+                        onchange={handleFieldChange}
+                    >
+                    </lightning-textarea>
+                </template>
+                <template if:true={field.isReference}>
+                    <c-record-typeahead
+                        label={field.label}
+                        placeholder={field.placeholder}
+                        min-length={typeaheadMinLength}
+                        required={field.required}
+                        disabled={disabled}
+                        results={field.results}
+                        value={field.displayValue}
+                        selected-label={field.selectedLabel}
+                        data-api-name={field.apiName}
+                        onsearch={handleLookupSearch}
+                        onselect={handleLookupSelect}
+                    >
+                    </c-record-typeahead>
+                </template>
+                <template if:true={field.isSimpleInput}>
+                    <lightning-input
+                        type={field.inputType}
+                        name={field.apiName}
+                        label={field.label}
+                        value={field.displayValue}
+                        required={field.required}
+                        disabled={disabled}
+                        step={field.numberStep}
+                        data-api-name={field.apiName}
+                        data-field-type={field.type}
+                        onchange={handleFieldChange}
+                    >
+                    </lightning-input>
+                </template>
+            </div>
+        </template>
+        <div class="slds-m-top_medium">
+            <lightning-button
+                type="submit"
+                variant="brand"
+                label={submitLabel}
+                disabled={disabled}
+            >
+            </lightning-button>
+        </div>
+    </form>
+</template>

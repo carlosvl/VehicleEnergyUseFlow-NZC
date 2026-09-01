@@ -1,6 +1,6 @@
 # 🚗 Vehicle Asset Energy Use (NZC)
 
-> **A Net Zero Cloud accelerator that captures vehicle fuel and energy use through a guided screen flow, with an Experience Cloud site for collecting Energy Use Records from external users**
+> **A Net Zero Cloud accelerator that captures vehicle fuel and energy use through a guided screen flow internally, and a reusable guest Lightning web component on Experience Cloud for unauthenticated Energy Use Record collection**
 
 [![Salesforce](https://img.shields.io/badge/Salesforce-00A1E0?style=for-the-badge&logo=salesforce&logoColor=white)](https://salesforce.com)
 [![Net Zero Cloud](https://img.shields.io/badge/Net_Zero_Cloud-FFB000?style=for-the-badge&logo=salesforce&logoColor=white)](https://help.salesforce.com/s/articleView?id=sf.netzero_cloud_intro.htm)
@@ -30,9 +30,10 @@
 
 ### 🌐 **External Collection**
 
-- **Experience Cloud Site**: Includes the **EUR collection** LWR site so partners and external users can submit Energy Use Records
+- **Experience Cloud Site**: Includes the **EUR collection** LWR site so partners, community users, and guests can submit Energy Use Records
+- **Guest LWC on EUR-lwc**: Public `/eur-lwc` hosts the config-driven **Guest Record Capture** component twice (vehicle `Vehicle_Energy_Use` and stationary `Stationary_Energy_Use`) so guests search a parent asset and create an energy use record without the flow
 - **Branded Workspace**: Ships network settings and branding for the collection community
-- **Authenticated Access**: Site is configured for authenticated users with public access enabled
+- **Authenticated + Public Access**: Site is configured for authenticated users with public access enabled; Home keeps the screen flow for members
 
 ### 🏗️ **Net Zero Cloud Integration**
 
@@ -135,8 +136,15 @@ After deploying with any method above, complete these manual steps:
    - Give community or partner users Read on Vehicle Asset Emission Source
    - Give Create and Read on Vehicle Asset Energy Use, including field-level access for fuel, date, and emissions factor fields
 
-5. **Verify the Site Flows**
-   - Home and **EUR-lwc** (`/eur-lwc`) both run `Vehicle_Asset_Energy_Use`
+5. **Configure Guest Capture (EUR-lwc)**
+   - Assign the **Guest Record Capture** permission set (`Guest_Record_Capture`) to the EUR collection **guest user**
+   - Create **guest user sharing rules** for Read on `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, and `OtherEmssnFctrSet`, and sharing that allows Create/Read on `VehicleAssetEnrgyUse` and `StnryAssetEnrgyUse` (guest sharing is org setup and is not in this package)
+   - Confirm **EUR-lwc** is a **public** page (`/eur-lwc`) so guests can open it without signing in
+   - Other Emissions Factor searches **Other Emissions Factor Set** (`OtherEmssnFctrSet`); there is no Other Emissions Factor object
+
+6. **Verify the Site**
+   - Home runs `Vehicle_Asset_Energy_Use` for authenticated members
+   - **EUR-lwc** (`/eur-lwc`) runs Guest Record Capture with configs `Vehicle_Energy_Use` and `Stationary_Energy_Use`
    - Optionally add the companion [NZC LLM Bill Ingestor](https://github.com/carlosvl/NZC-LLM-Bill-Ingestor) if you want bill upload
    - Follow the [Usage instructions](#-usage) below to capture your first vehicle energy use record
 
@@ -154,10 +162,29 @@ After deploying with any method above, complete these manual steps:
 
 ### 🌐 **Collect Records from the Experience Cloud Site**
 
+**Authenticated (Home)**
+
 1. **Share** the EUR collection site URL with partner or community users
 2. **Sign in** as a user whose profile is a member of the site
-3. **Complete** the **Vehicle Asset Energy Use** flow on Home or on the **EUR-lwc** page
+3. **Complete** the **Vehicle Asset Energy Use** flow on Home
 4. **Confirm** the new Vehicle Asset Energy Use record in Salesforce
+
+**Guest (EUR-lwc)**
+
+1. **Open** the public `/eur-lwc` page (no sign-in)
+2. **Choose** the Vehicle energy use or Stationary energy use card
+3. **Search** for the matching parent asset (at least 3 characters)
+4. **Fill** Name, Other Emissions Factor, fuel type, consumption, and unit (dates are optional; vehicle also has optional efficiency)
+5. **Submit** to create the energy use record linked to that asset
+
+### ➕ **Add Another Capture Object**
+
+The guest composer is reused; vehicle is a config row, not a forked UI.
+
+1. Add a Field Set on the target object (do not put the parent lookup in the Field Set)
+2. Add a `Guest_Capture_Config__mdt` row for search object, target object, parent lookup, Field Set, defaults, and card labels
+3. Grant FLS/CRUD and guest sharing for those objects
+4. Place **Guest Record Capture** on a page and set the Capture Config developer name
 
 ### 📊 **What Gets Created**
 
@@ -174,7 +201,10 @@ After deploying with any method above, complete these manual steps:
 
 This accelerator contains the following metadata:
 
-- **1 Screen Flow** (`Vehicle_Asset_Energy_Use`)
+- **1 Screen Flow** (`Vehicle_Asset_Energy_Use`) — internal Lightning and EUR collection Home
+- **Guest Record Capture LWC** — public EUR-lwc page; configs `Vehicle_Energy_Use` and `Stationary_Energy_Use`
+- **Guest_Capture_Config__mdt** plus Field Sets `Guest_Energy_Use_Capture` (vehicle and stationary) and permission set `Guest_Record_Capture`
+- **Apex** guest capture engine (controller, service, selectors) running in user mode
 - **1 ExperienceBundle** (`EUR_collection1` — EUR collection LWR site, URL prefix `eurlwr`)
 - **1 Network** (`EUR collection`)
 - **1 Network Branding** (`cbEUR_collection`)
@@ -187,12 +217,16 @@ Net Zero Cloud in a typical org has two asset families for this data model: **St
 graph TB
     A[Internal User] --> B[Vehicle Asset Emission Source]
     B --> C[Vehicle Asset Energy Use Flow]
-    D[External User] --> E[EUR collection Experience Cloud]
+    D[Authenticated Site User] --> E[EUR collection Home]
     E --> C
-    C --> F[Get Vehicle Asset]
-    C --> G[Fuel Consumption Screen]
-    G --> H[Vehicle Asset Energy Use Record]
-    H --> I[Net Zero Cloud]
+    F[Guest User] --> G[EUR-lwc Public Page]
+    G --> H[Guest Record Capture LWC]
+    H --> I[Guest Capture Apex]
+    C --> J[Vehicle Asset Energy Use Record]
+    I --> J
+    I --> L[Stationary Asset Energy Use Record]
+    J --> K[Net Zero Cloud]
+    L --> K
 ```
 
 ### 🧩 **Key Components**
@@ -200,10 +234,15 @@ graph TB
 | Component | Description |
 | ---- | ---- |
 | `Vehicle_Asset_Energy_Use` | Screen flow that looks up a Vehicle Asset Emission Source and creates a Vehicle Asset Energy Use record |
-| `EUR collection` | Experience Cloud LWR site for external Energy Use Record collection |
-| `VehicleAssetEmssnSrc` | Net Zero Cloud Vehicle Asset Emission Source — parent record passed in as `RecordID` |
-| `VehicleAssetEnrgyUse` | Net Zero Cloud Vehicle Asset Energy Use — record created by the flow |
-| `OtherEmssnFctrId` | Required Other Emissions Factor lookup on the energy use record |
+| Guest Record Capture | Exposed Experience Cloud LWC; `@api configName` default `Vehicle_Energy_Use` |
+| `Guest_Record_Capture` | Permission set for guest Apex, CRUD, and FLS — assign to the site guest user |
+| `Guest_Capture_Config__mdt` | Allowlist config (search object, target object, Field Set, defaults, card labels) |
+| `EUR collection` | Experience Cloud LWR site; Home = vehicle flow, `/eur-lwc` = guest LWC (vehicle + stationary) |
+| `VehicleAssetEmssnSrc` | Net Zero Cloud Vehicle Asset Emission Source — parent record |
+| `VehicleAssetEnrgyUse` | Net Zero Cloud Vehicle Asset Energy Use — record created by the flow or guest LWC |
+| `StnryAssetEnvrSrc` | Net Zero Cloud Stationary Asset Environmental Source — parent record |
+| `StnryAssetEnrgyUse` | Net Zero Cloud Stationary Asset Energy Use — record created by the guest LWC |
+| `OtherEmssnFctrId` | Required lookup to Other Emissions Factor Set (`OtherEmssnFctrSet`) |
 
 ---
 

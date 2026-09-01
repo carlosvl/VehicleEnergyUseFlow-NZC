@@ -1,2 +1,6 @@
 **/jsconfig.json
 **/.eslintrc.json
+
+# LWC Jest (do not deploy)
+**/lwc/**/__tests__/**
+**/lwc/**/__mocks__/**

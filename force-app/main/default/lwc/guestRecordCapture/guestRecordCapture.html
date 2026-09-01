@@ -1,0 +1,51 @@
+<template>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span class="slds-text-heading_small">{formTitle}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <template if:true={isLoading}>
+                <div class="slds-is-relative slds-p-around_large">
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </div>
+            </template>
+            <div class="slds-m-bottom_small">
+                <c-inline-status variant={statusVariant} message={statusMessage}></c-inline-status>
+            </div>
+            <template if:true={isReady}>
+                <div class="slds-m-bottom_medium">
+                    <c-record-typeahead
+                        label={parentSearchLabel}
+                        placeholder="Search by name"
+                        min-length={minSearchLength}
+                        required
+                        disabled={isBusy}
+                        results={parentResults}
+                        value={parentId}
+                        selected-label={parentLabel}
+                        onsearch={handleParentSearch}
+                        onselect={handleParentSelect}
+                    >
+                    </c-record-typeahead>
+                </div>
+                <c-dynamic-field-form
+                    fields={fields}
+                    values={formValues}
+                    lookup-results={lookupResults}
+                    typeahead-min-length={minSearchLength}
+                    disabled={isFormDisabled}
+                    submit-label={submitLabel}
+                    onsearch={handleLookupSearch}
+                    onsubmit={handleFormSubmit}
+                >
+                </c-dynamic-field-form>
+            </template>
+        </div>
+    </article>
+</template>

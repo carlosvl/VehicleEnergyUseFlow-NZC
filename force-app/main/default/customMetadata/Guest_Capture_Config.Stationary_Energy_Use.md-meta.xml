@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <description>Guest capture configuration for Stationary Asset Energy Use on Experience Cloud.</description>
+    <label>Stationary Energy Use</label>
+    <protected>false</protected>
+    <values>
+        <field>Search_Object__c</field>
+        <value xsi:type="xsd:string">StnryAssetEnvrSrc</value>
+    </values>
+    <values>
+        <field>Search_Field__c</field>
+        <value xsi:type="xsd:string">Name</value>
+    </values>
+    <values>
+        <field>Target_Object__c</field>
+        <value xsi:type="xsd:string">StnryAssetEnrgyUse</value>
+    </values>
+    <values>
+        <field>Parent_Lookup_Field__c</field>
+        <value xsi:type="xsd:string">StnryAssetEnvrSrcId</value>
+    </values>
+    <values>
+        <field>Field_Set_Name__c</field>
+        <value xsi:type="xsd:string">Guest_Energy_Use_Capture</value>
+    </values>
+    <values>
+        <field>Min_Search_Length__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+    <values>
+        <field>Result_Limit__c</field>
+        <value xsi:type="xsd:double">25.0</value>
+    </values>
+    <values>
+        <field>Default_Field_Values__c</field>
+        <value xsi:type="xsd:string">{&quot;FuelConsumptionUnit&quot;:&quot;kWh&quot;}</value>
+    </values>
+    <values>
+        <field>Form_Title__c</field>
+        <value xsi:type="xsd:string">Stationary energy use</value>
+    </values>
+    <values>
+        <field>Parent_Search_Label__c</field>
+        <value xsi:type="xsd:string">Stationary asset</value>
+    </values>
+    <values>
+        <field>Submit_Label__c</field>
+        <value xsi:type="xsd:string">Create energy use record</value>
+    </values>
+</CustomMetadata>

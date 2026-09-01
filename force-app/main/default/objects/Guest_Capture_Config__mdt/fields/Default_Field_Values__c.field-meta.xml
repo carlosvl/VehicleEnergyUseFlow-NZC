@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Default_Field_Values__c</fullName>
+    <description>Optional JSON object mapping Field Set field API names to default values. Applied on create when the submitted value is empty. Query this field with SOQL (getInstance truncates long text).</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>JSON map, for example {"FuelEfficiencyUnit":"MILES_PER_GALLON"}</inlineHelpText>
+    <label>Default Field Values</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Min_Search_Length__c</fullName>
+    <defaultValue>3</defaultValue>
+    <description>Minimum typeahead term length before Apex runs a search. Shorter terms return an empty list.</description>
+    <externalId>false</externalId>
+    <fieldManageability>SubscriberControlled</fieldManageability>
+    <inlineHelpText>Minimum characters required to search. Default 3.</inlineHelpText>
+    <label>Min Search Length</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

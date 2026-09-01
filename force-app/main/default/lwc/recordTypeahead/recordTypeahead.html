@@ -1,0 +1,95 @@
+<template>
+    <div class={formElementClass}>
+        <label class="slds-form-element__label" for={inputId}>
+            <abbr if:true={required} class="slds-required" title="required">*</abbr>
+            {computedLabel}
+        </label>
+        <div class="slds-form-element__control">
+            <div class="slds-combobox_container">
+                <div class={comboboxClass}>
+                    <div
+                        class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                        role="none"
+                    >
+                        <input
+                            type="text"
+                            role="combobox"
+                            class={inputClass}
+                            id={inputId}
+                            value={inputValue}
+                            placeholder={placeholder}
+                            disabled={disabled}
+                            autocomplete="off"
+                            spellcheck="false"
+                            aria-autocomplete="list"
+                            aria-controls={listboxId}
+                            aria-expanded={ariaExpanded}
+                            aria-haspopup="listbox"
+                            aria-invalid={ariaInvalid}
+                            aria-required={ariaRequired}
+                            oninput={handleInput}
+                            onfocus={handleFocus}
+                            onblur={handleBlur}
+                            onkeydown={handleKeyDown}
+                        />
+                        <lightning-button-icon
+                            if:true={showClear}
+                            class="slds-input__icon slds-input__icon_right"
+                            icon-name="utility:clear"
+                            alternative-text="Clear selection"
+                            variant="bare"
+                            disabled={disabled}
+                            onclick={handleClear}
+                        >
+                        </lightning-button-icon>
+                        <lightning-icon
+                            if:false={showClear}
+                            icon-name="utility:search"
+                            alternative-text="Search"
+                            size="x-small"
+                            class="slds-input__icon slds-input__icon_right"
+                        >
+                        </lightning-icon>
+                    </div>
+                    <div
+                        id={listboxId}
+                        class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-with-icon-10"
+                        role="listbox"
+                        aria-hidden={listboxAriaHidden}
+                    >
+                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                            <template for:each={optionItems} for:item="option">
+                                <li key={option.id} role="presentation" class="slds-listbox__item">
+                                    <div
+                                        id={option.optionId}
+                                        class={option.cssClass}
+                                        role="option"
+                                        aria-selected={option.ariaSelected}
+                                        data-id={option.id}
+                                        onmousedown={handleOptionMouseDown}
+                                        onclick={handleOptionClick}
+                                    >
+                                        <span class="slds-media__figure slds-listbox__option-icon">
+                                            <lightning-icon
+                                                if:true={option.isSelected}
+                                                icon-name="utility:check"
+                                                size="x-small"
+                                                alternative-text="Selected"
+                                            >
+                                            </lightning-icon>
+                                        </span>
+                                        <span class="slds-media__body">
+                                            <span class="slds-truncate" title={option.label}>{option.label}</span>
+                                        </span>
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div if:true={showMinLengthHint} class="slds-form-element__help">{minLengthHint}</div>
+        <div if:true={showRequiredError} class="slds-form-element__help" role="alert">{requiredErrorMessage}</div>
+    </div>
+</template>

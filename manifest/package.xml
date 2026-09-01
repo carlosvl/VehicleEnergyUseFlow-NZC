@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
+        <members>FieldSetSchemaService</members>
+        <members>FieldSetSchemaServiceTest</members>
+        <members>GuestCaptureConfigSelector</members>
+        <members>GuestCaptureConfigSelectorTest</members>
+        <members>GuestRecordCaptureController</members>
+        <members>GuestRecordCaptureControllerTest</members>
+        <members>GuestRecordCaptureDto</members>
+        <members>GuestRecordCaptureException</members>
+        <members>GuestRecordCaptureService</members>
+        <members>GuestRecordCaptureServiceTest</members>
+        <members>GuestRecordCaptureTestFactory</members>
+        <members>GuestSObjectSelector</members>
+        <members>GuestSObjectSelectorTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Guest_Capture_Config.Stationary_Energy_Use</members>
+        <members>Guest_Capture_Config.Vehicle_Energy_Use</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <members>Guest_Capture_Config__mdt</members>
+        <members>StnryAssetEnrgyUse</members>
+        <members>VehicleAssetEnrgyUse</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
         <members>EUR_collection1</members>
         <name>ExperienceBundle</name>
     </types>
@@ -9,12 +36,24 @@
         <name>Flow</name>
     </types>
     <types>
+        <members>dynamicFieldForm</members>
+        <members>guestRecordCapture</members>
+        <members>guestRecordCaptureService</members>
+        <members>inlineStatus</members>
+        <members>recordTypeahead</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
         <members>EUR collection</members>
         <name>Network</name>
     </types>
     <types>
         <members>cbEUR_collection</members>
         <name>NetworkBranding</name>
+    </types>
+    <types>
+        <members>Guest_Record_Capture</members>
+        <name>PermissionSet</name>
     </types>
     <version>64.0</version>
 </Package>
