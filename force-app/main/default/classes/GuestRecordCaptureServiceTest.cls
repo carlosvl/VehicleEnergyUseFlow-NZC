@@ -228,9 +228,10 @@ private class GuestRecordCaptureServiceTest {
     static void createRecord_happyPath_contact_appliesDefaults() {
         Account parent = new Account(Name = 'Parent For Create');
         insert parent;
+        SearchSpy spy = new SearchSpy();
         GuestRecordCaptureService service = serviceFor(
             GuestRecordCaptureTestFactory.accountContactConfig(),
-            new SearchSpy(),
+            spy,
             contactSchema()
         );
 
@@ -254,6 +255,128 @@ private class GuestRecordCaptureServiceTest {
         Assert.areEqual(parent.Id, created.AccountId);
         Assert.areEqual('guest-default', created.Description);
         Assert.areEqual(Date.newInstance(2020, 1, 15), created.Birthdate);
+        Assert.isFalse(spy.selectByIdCalled, 'Blank parent-copied map must not query the parent.');
+    }
+
+    @IsTest
+    static void createRecord_copiesParentField_whenConfigured() {
+        Guest_Capture_Config__mdt config = GuestRecordCaptureTestFactory.accountContactConfig();
+        config.Parent_Copied_Fields__c = '{"Phone":"Phone"}';
+        Account parent = new Account(Name = 'Parent With Phone', Phone = '5550100');
+        insert parent;
+        GuestRecordCaptureService service = serviceFor(config, new GuestSObjectSelector(), contactSchema());
+
+        Id createdId = service.createRecord(
+            GuestRecordCaptureTestFactory.CONFIG_NAME,
+            parent.Id,
+            new Map<String, Object>{ 'LastName' => 'Copied' }
+        );
+
+        Contact created = [SELECT Phone, AccountId FROM Contact WHERE Id = :createdId];
+        Assert.areEqual('5550100', created.Phone);
+        Assert.areEqual(parent.Id, created.AccountId);
+    }
+
+    @IsTest
+    static void createRecord_blankParentCopiedValue_throws() {
+        Guest_Capture_Config__mdt config = GuestRecordCaptureTestFactory.accountContactConfig();
+        config.Parent_Copied_Fields__c = '{"Phone":"Phone"}';
+        Account parent = new Account(Name = 'Parent Without Phone');
+        insert parent;
+        GuestRecordCaptureService service = serviceFor(config, new GuestSObjectSelector(), contactSchema());
+
+        try {
+            service.createRecord(
+                GuestRecordCaptureTestFactory.CONFIG_NAME,
+                parent.Id,
+                new Map<String, Object>{ 'LastName' => 'Copied' }
+            );
+            Assert.fail('Expected a blank parent copied field to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('no value'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void createRecord_rejectsClientValueForParentCopiedField() {
+        Guest_Capture_Config__mdt config = GuestRecordCaptureTestFactory.accountContactConfig();
+        config.Parent_Copied_Fields__c = '{"Description":"Description"}';
+        Account parent = new Account(Name = 'Parent Description Copy', Description = 'from-parent');
+        insert parent;
+        GuestRecordCaptureService service = serviceFor(config, new GuestSObjectSelector(), contactSchema());
+
+        try {
+            service.createRecord(
+                GuestRecordCaptureTestFactory.CONFIG_NAME,
+                parent.Id,
+                new Map<String, Object>{ 'LastName' => 'Copied', 'Description' => 'from-client' }
+            );
+            Assert.fail('Expected a client parent-copied field to be rejected.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('Field is not allowed: Description'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void createRecord_parentNotFoundForCopy_throws() {
+        Guest_Capture_Config__mdt config = GuestRecordCaptureTestFactory.accountContactConfig();
+        config.Parent_Copied_Fields__c = '{"Phone":"Phone"}';
+        Account parent = new Account(Name = 'Parent For Missing Copy');
+        insert parent;
+        SearchSpy spy = new SearchSpy();
+        GuestRecordCaptureService service = serviceFor(config, spy, contactSchema());
+
+        try {
+            service.createRecord(
+                GuestRecordCaptureTestFactory.CONFIG_NAME,
+                parent.Id,
+                new Map<String, Object>{ 'LastName' => 'Copied' }
+            );
+            Assert.fail('Expected a missing parent to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('not found'), e.getMessage());
+            Assert.isTrue(spy.selectByIdCalled);
+        }
+    }
+
+    @IsTest
+    static void createRecord_invalidParentCopiedJson_throws() {
+        Guest_Capture_Config__mdt config = GuestRecordCaptureTestFactory.accountContactConfig();
+        config.Parent_Copied_Fields__c = 'not-json';
+        Account parent = new Account(Name = 'Parent Invalid Copy Json');
+        insert parent;
+        GuestRecordCaptureService service = serviceFor(config, new SearchSpy(), contactSchema());
+
+        try {
+            service.createRecord(
+                GuestRecordCaptureTestFactory.CONFIG_NAME,
+                parent.Id,
+                new Map<String, Object>{ 'LastName' => 'Guest' }
+            );
+            Assert.fail('Expected invalid parent copied JSON to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('JSON'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void createRecord_invalidParentCopiedValueType_throws() {
+        Guest_Capture_Config__mdt config = GuestRecordCaptureTestFactory.accountContactConfig();
+        config.Parent_Copied_Fields__c = '{"Phone":1}';
+        Account parent = new Account(Name = 'Parent Invalid Copy Type');
+        insert parent;
+        GuestRecordCaptureService service = serviceFor(config, new SearchSpy(), contactSchema());
+
+        try {
+            service.createRecord(
+                GuestRecordCaptureTestFactory.CONFIG_NAME,
+                parent.Id,
+                new Map<String, Object>{ 'LastName' => 'Guest' }
+            );
+            Assert.fail('Expected a non-string parent copied value to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('field API names'), e.getMessage());
+        }
     }
 
     @IsTest
@@ -361,6 +484,8 @@ private class GuestRecordCaptureServiceTest {
                 .newSObject();
             factor.put('Name', 'Guest Apex Factor ' + String.valueOf(Crypto.getRandomInteger()));
             insert factor;
+            parent.put('OtherEmssnFctrId', factor.Id);
+            update parent;
 
             Id createdId = service.createRecord(
                 GuestRecordCaptureTestFactory.CONFIG_NAME,
@@ -369,11 +494,15 @@ private class GuestRecordCaptureServiceTest {
                     'Name' => 'Guest Energy Use',
                     'FuelType' => 'Gasoline',
                     'FuelConsumption' => 10,
-                    'FuelConsumptionUnit' => 'LITERS',
-                    'OtherEmssnFctrId' => factor.Id
+                    'FuelConsumptionUnit' => 'LITERS'
                 }
             );
             Assert.isNotNull(createdId);
+            SObject created = Database.query(
+                'SELECT OtherEmssnFctrId FROM VehicleAssetEnrgyUse WHERE Id = :createdId',
+                AccessLevel.USER_MODE
+            )[0];
+            Assert.areEqual(factor.Id, created.get('OtherEmssnFctrId'));
         } catch (DmlException e) {
             // NZC may enforce additional required fields or validation in this org.
             Assert.isTrue(e.getNumDml() >= 0, e.getMessage());
@@ -436,6 +565,7 @@ private class GuestRecordCaptureServiceTest {
                 'Guest_Energy_Use_Capture'
             );
         Assert.isFalse(allowed.contains('StnryAssetEnvrSrcId'));
+        Assert.isFalse(allowed.contains('OtherEmssnFctrId'));
         Assert.isTrue(allowed.contains('Name'));
         Assert.isFalse(allowed.contains('FuelEfficiency'));
 
@@ -451,6 +581,20 @@ private class GuestRecordCaptureServiceTest {
             Assert.fail('Expected parent lookup in payload to be rejected.');
         } catch (GuestRecordCaptureException e) {
             Assert.isTrue(e.getMessage().contains('Field is not allowed: StnryAssetEnvrSrcId'), e.getMessage());
+        }
+
+        try {
+            service.createRecord(
+                GuestRecordCaptureTestFactory.STATIONARY_CONFIG_NAME,
+                parent.Id,
+                new Map<String, Object>{
+                    'Name' => 'Stationary Use',
+                    'OtherEmssnFctrId' => parent.Id
+                }
+            );
+            Assert.fail('Expected emissions factor in payload to be rejected.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('Field is not allowed: OtherEmssnFctrId'), e.getMessage());
         }
 
         try {
@@ -546,10 +690,12 @@ private class GuestRecordCaptureServiceTest {
 
     private class SearchSpy extends GuestSObjectSelector {
         Boolean wasCalled = false;
+        Boolean selectByIdCalled = false;
         Schema.SObjectType sobjectType;
         String searchField;
         Integer resultLimit;
         List<SObject> records = new List<SObject>();
+        SObject parentById;
 
         public override List<SObject> selectBySearchTerm(
             Schema.SObjectType sobjectType,
@@ -562,6 +708,16 @@ private class GuestRecordCaptureServiceTest {
             this.searchField = searchFieldApiName;
             this.resultLimit = resultLimit;
             return records;
+        }
+
+        public override SObject selectById(
+            Schema.SObjectType sobjectType,
+            Id recordId,
+            List<String> fieldApiNames
+        ) {
+            selectByIdCalled = true;
+            this.sobjectType = sobjectType;
+            return parentById;
         }
     }
 }

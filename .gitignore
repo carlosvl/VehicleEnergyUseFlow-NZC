@@ -9,3 +9,8 @@ coverage/
 *.log
 .vscode/
 .forceignore.bak
+
+# Org-retrieved Experience Cloud (CustomSite includes siteAdmin usernames; not OSS source)
+force-app/main/default/sites/
+force-app/main/default/digitalExperiences/
+force-app/main/default/digitalExperienceConfigs/

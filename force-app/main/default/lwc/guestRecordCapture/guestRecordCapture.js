@@ -106,10 +106,10 @@ export default class GuestRecordCapture extends LightningElement {
     }
 
     async handleFormSubmit(event) {
-        const values =
-            event.detail && event.detail.values && typeof event.detail.values === 'object'
-                ? event.detail.values
-                : {};
+        if (!(event.detail && event.detail.values && typeof event.detail.values === 'object')) {
+            return;
+        }
+        const values = event.detail.values;
         if (!this.parentId) {
             this.statusVariant = 'error';
             this.statusMessage = 'Select a parent record before submitting.';

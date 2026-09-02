@@ -8,7 +8,7 @@
 
 /**
  * @description Selector for Guest_Capture_Config__mdt. Uses SOQL (not getInstance) so
- *              Default_Field_Values__c long text is not truncated at 255 characters.
+ *              long text (defaults and parent-copied fields) is not truncated at 255 characters.
  */
 public inherited sharing virtual class GuestCaptureConfigSelector {
     /**
@@ -33,6 +33,7 @@ public inherited sharing virtual class GuestCaptureConfigSelector {
                 Min_Search_Length__c,
                 Result_Limit__c,
                 Default_Field_Values__c,
+                Parent_Copied_Fields__c,
                 Form_Title__c,
                 Parent_Search_Label__c,
                 Submit_Label__c

@@ -47,4 +47,60 @@ private class GuestSObjectSelectorTest {
         Assert.areEqual(matching.Id, rows[0].Id);
         Assert.areEqual(uniqueName, (String) rows[0].get('Name'));
     }
+
+    @IsTest
+    static void selectById_nullType_throws() {
+        try {
+            new GuestSObjectSelector().selectById(null, UserInfo.getUserId(), new List<String>{ 'Name' });
+            Assert.fail('Expected missing object type to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('search object'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void selectById_nullId_throws() {
+        try {
+            new GuestSObjectSelector().selectById(Account.SObjectType, null, new List<String>{ 'Name' });
+            Assert.fail('Expected missing Id to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('Parent Id is required'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void selectById_unknownField_throws() {
+        Account parent = new Account(Name = 'GuestCapSel ById');
+        insert parent;
+        try {
+            new GuestSObjectSelector()
+                .selectById(Account.SObjectType, parent.Id, new List<String>{ 'NoSuchField__c' });
+            Assert.fail('Expected unknown field to fail.');
+        } catch (GuestRecordCaptureException e) {
+            Assert.isTrue(e.getMessage().contains('Unknown field'), e.getMessage());
+        }
+    }
+
+    @IsTest
+    static void selectById_findsAccountFields() {
+        Account matching = new Account(Name = 'GuestCapSel Phone', Phone = '5550199');
+        insert matching;
+
+        Test.startTest();
+        SObject row = new GuestSObjectSelector()
+            .selectById(Account.SObjectType, matching.Id, new List<String>{ 'Phone', 'Name' });
+        Test.stopTest();
+
+        Assert.isNotNull(row);
+        Assert.areEqual(matching.Id, row.Id);
+        Assert.areEqual('5550199', (String) row.get('Phone'));
+        Assert.areEqual('GuestCapSel Phone', (String) row.get('Name'));
+    }
+
+    @IsTest
+    static void selectById_missingRecord_returnsNull() {
+        SObject row = new GuestSObjectSelector()
+            .selectById(Account.SObjectType, UserInfo.getUserId(), new List<String>{ 'Name' });
+        Assert.isNull(row);
+    }
 }

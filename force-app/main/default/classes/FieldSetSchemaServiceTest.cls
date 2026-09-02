@@ -90,7 +90,7 @@ private class FieldSetSchemaServiceTest {
         FieldSetSchemaService schemaService = new FieldSetSchemaService();
         Set<String> allowed = schemaService.getAllowedFieldNames(energyUseType, 'Guest_Energy_Use_Capture');
         Assert.isTrue(allowed.contains('Name'));
-        Assert.isTrue(allowed.contains('OtherEmssnFctrId'));
+        Assert.isFalse(allowed.contains('OtherEmssnFctrId'));
         Assert.isTrue(allowed.contains('FuelType'));
         Assert.isTrue(allowed.contains('FuelConsumption'));
         Assert.isTrue(allowed.contains('FuelConsumptionUnit'));
@@ -106,9 +106,8 @@ private class FieldSetSchemaServiceTest {
             apiNameToField.put(descriptor.apiName, descriptor);
         }
         Assert.isTrue(apiNameToField.get('Name').required);
-        Assert.isTrue(apiNameToField.get('OtherEmssnFctrId').required);
+        Assert.isFalse(apiNameToField.containsKey('OtherEmssnFctrId'));
         Assert.isFalse(apiNameToField.get('StartDate').required);
-        Assert.isTrue(apiNameToField.get('OtherEmssnFctrId').referenceTo.contains('OtherEmssnFctrSet'));
         Assert.isTrue(apiNameToField.get('FuelType').picklistOptions.size() > 0);
     }
 
@@ -122,7 +121,7 @@ private class FieldSetSchemaServiceTest {
         FieldSetSchemaService schemaService = new FieldSetSchemaService();
         Set<String> allowed = schemaService.getAllowedFieldNames(energyUseType, 'Guest_Energy_Use_Capture');
         Assert.isTrue(allowed.contains('Name'));
-        Assert.isTrue(allowed.contains('OtherEmssnFctrId'));
+        Assert.isFalse(allowed.contains('OtherEmssnFctrId'));
         Assert.isTrue(allowed.contains('FuelType'));
         Assert.isTrue(allowed.contains('FuelConsumption'));
         Assert.isTrue(allowed.contains('FuelConsumptionUnit'));
@@ -141,9 +140,8 @@ private class FieldSetSchemaServiceTest {
             apiNameToField.put(descriptor.apiName, descriptor);
         }
         Assert.isTrue(apiNameToField.get('Name').required);
-        Assert.isTrue(apiNameToField.get('OtherEmssnFctrId').required);
+        Assert.isFalse(apiNameToField.containsKey('OtherEmssnFctrId'));
         Assert.isFalse(apiNameToField.get('StartDate').required);
-        Assert.isTrue(apiNameToField.get('OtherEmssnFctrId').referenceTo.contains('OtherEmssnFctrSet'));
     }
 
     private class DescriptorStub extends FieldSetSchemaService {

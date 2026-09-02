@@ -36,6 +36,10 @@
         <value xsi:type="xsd:string">{&quot;FuelConsumptionUnit&quot;:&quot;kWh&quot;}</value>
     </values>
     <values>
+        <field>Parent_Copied_Fields__c</field>
+        <value xsi:type="xsd:string">{&quot;OtherEmssnFctrId&quot;:&quot;OtherEmssnFctrId&quot;}</value>
+    </values>
+    <values>
         <field>Form_Title__c</field>
         <value xsi:type="xsd:string">Stationary energy use</value>
     </values>

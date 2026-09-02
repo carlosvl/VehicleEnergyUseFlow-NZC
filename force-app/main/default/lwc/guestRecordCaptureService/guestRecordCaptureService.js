@@ -24,7 +24,7 @@ export function getConfig(configName) {
  * any other purpose is a Field Set lookup field API name.
  * @param {string} configName Config developer name.
  * @param {string} term Search text.
- * @param {string} purpose `parent` or a lookup field API name such as OtherEmssnFctrId.
+ * @param {string} purpose `parent` or a lookup field API name.
  * @returns {Promise<Array<{id: string, label: string}>>}
  */
 export function searchRecords(configName, term, purpose) {

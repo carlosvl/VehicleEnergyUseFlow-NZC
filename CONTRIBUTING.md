@@ -11,8 +11,9 @@ The intent and goal of open sourcing this project is to increase the contributor
 # Getting started
 
 1. Review the [README](README.md) for install and usage.
-2. Review [REPOSITORY_SUMMARY.md](REPOSITORY_SUMMARY.md) for architecture and inventory.
-3. Open a GitHub Issue before starting large changes.
+2. Review [docs/admin-setup/README.md](docs/admin-setup/README.md) for post-deploy Setup that is not in metadata.
+3. Review [REPOSITORY_SUMMARY.md](REPOSITORY_SUMMARY.md) for architecture and inventory.
+4. Open a GitHub Issue before starting large changes.
 
 # Issues, requests & ideas
 
@@ -42,6 +43,7 @@ Use the [GitHub Issues](https://github.com/carlosvl/VehicleEnergyUseFlow-NZC/iss
 - [ ] Tests pass and coverage stays above 75% for any Apex you add
 - [ ] Dependencies are minimized and use Apache 2.0, BSD-3, MIT, ISC, or MPL licenses
 - [ ] Experience Cloud pages only reference metadata that ships in this repository (or is a standard Salesforce component)
+- [ ] README, wiki, admin-setup, and REPOSITORY_SUMMARY stay in sync when Setup or guest capture behavior changes
 - [ ] Changes are approved via peer code review
 
 # Creating a Pull Request
@@ -65,7 +67,7 @@ sf org login web --alias MyOrg
 sf project deploy start --source-dir force-app --target-org MyOrg
 ```
 
-Net Zero Cloud is a licensed product and is not typically available on scratch orgs. Develop and test in a sandbox or Developer Edition that already has Net Zero Cloud and Digital Experiences enabled.
+Net Zero Cloud is a licensed product and is not typically available on scratch orgs. Develop and test in a sandbox or Developer Edition that already has Net Zero Cloud and Digital Experiences enabled. After deploy, complete the administrator steps in [docs/admin-setup/README.md](docs/admin-setup/README.md) (guest public APIs, sharing, site publish). After LWC changes, republish the Experience Cloud site or unauthenticated pages keep the previous webruntime bundle.
 
 # Code of Conduct
 

@@ -29,7 +29,7 @@ public with sharing class GuestRecordCaptureController {
      * @description Typeahead search against the allowlisted parent object or a Field Set lookup.
      * @param configName Guest_Capture_Config__mdt developer name.
      * @param term Search text.
-     * @param purpose `parent` or a Field Set reference field API name (for example OtherEmssnFctrId).
+     * @param purpose `parent` or a Field Set reference field API name.
      * @return SearchResult rows.
      */
     @AuraEnabled(cacheable=true)

@@ -24,7 +24,6 @@ jest.mock('c/guestRecordCaptureService', () => {
 });
 
 const PARENT_ID = 'a0A000000000001AAA';
-const FACTOR_ID = 'a0B000000000001AAA';
 const CREATED_ID = 'a0C000000000001AAA';
 
 const MOCK_CONFIG = {
@@ -47,13 +46,6 @@ const MOCK_SCHEMA = [
             { label: 'Diesel', value: 'Diesel' },
             { label: 'Gasoline', value: 'Gasoline' }
         ]
-    },
-    {
-        apiName: 'OtherEmssnFctrId',
-        label: 'Other Emissions Factor',
-        type: 'REFERENCE',
-        required: true,
-        referenceTo: ['OtherEmssnFctrSet']
     }
 ];
 
@@ -140,12 +132,9 @@ describe('c-guest-record-capture', () => {
         expect(form).not.toBeNull();
         expect(form.shadowRoot.querySelectorAll('lightning-input').length).toBe(1);
         expect(form.shadowRoot.querySelectorAll('lightning-combobox').length).toBe(1);
-        expect(form.shadowRoot.querySelectorAll('c-record-typeahead').length).toBe(1);
+        expect(form.shadowRoot.querySelectorAll('c-record-typeahead').length).toBe(0);
         expect(form.shadowRoot.querySelector('lightning-input').label).toBe('Name');
         expect(form.shadowRoot.querySelector('lightning-combobox').label).toBe('Fuel Type');
-        expect(
-            form.shadowRoot.querySelector('c-record-typeahead').shadowRoot.textContent
-        ).toContain('Other Emissions Factor');
         expect(element.shadowRoot.querySelector('.slds-card__header-title').textContent).toContain(
             'Vehicle energy use'
         );
@@ -199,25 +188,6 @@ describe('c-guest-record-capture', () => {
         expect(options[1].textContent).toContain('Beta Vehicle');
     });
 
-    it('debounces lookup search with the field API name as purpose', async () => {
-        const element = await createLoadedComposer();
-        await selectParent(element);
-
-        searchRecords.mockResolvedValue([{ id: FACTOR_ID, label: 'Factor One' }]);
-        const lookup = getForm(element).shadowRoot.querySelector('c-record-typeahead');
-
-        jest.useFakeTimers();
-        await typeIntoTypeahead(lookup, 'fac');
-        expect(searchRecords).not.toHaveBeenCalled();
-        jest.advanceTimersByTime(300);
-        jest.useRealTimers();
-        await flushPromises();
-
-        expect(searchRecords).toHaveBeenCalledWith('Vehicle_Energy_Use', 'fac', 'OtherEmssnFctrId');
-        const options = lookup.shadowRoot.querySelectorAll('[role="option"]');
-        expect(options[0].textContent).toContain('Factor One');
-    });
-
     it('submits createRecord with the parent id and form values', async () => {
         const element = await createLoadedComposer();
         await selectParent(element);
@@ -227,10 +197,6 @@ describe('c-guest-record-capture', () => {
 
         const nameInput = form.shadowRoot.querySelector('lightning-input');
         nameInput.dispatchEvent(new CustomEvent('change', { detail: { value: 'Trip 1' } }));
-        const lookup = form.shadowRoot.querySelector('c-record-typeahead');
-        lookup.dispatchEvent(
-            new CustomEvent('select', { detail: { id: FACTOR_ID, label: 'Factor One' } })
-        );
         await flushPromises();
 
         submitForm(form);
@@ -241,11 +207,24 @@ describe('c-guest-record-capture', () => {
             'Vehicle_Energy_Use',
             PARENT_ID,
             expect.objectContaining({
-                Name: 'Trip 1',
-                OtherEmssnFctrId: FACTOR_ID
+                Name: 'Trip 1'
             })
         );
+        expect(createRecord.mock.calls[0][2]).not.toHaveProperty('OtherEmssnFctrId');
         expect(getStatus(element).shadowRoot.textContent).toContain('Record created successfully.');
+    });
+
+    it('does not call createRecord for a native submit without form values', async () => {
+        const element = await createLoadedComposer();
+        await selectParent(element);
+
+        const form = getForm(element);
+        form.dispatchEvent(new CustomEvent('submit', { bubbles: true, composed: true }));
+        await flushPromises();
+
+        expect(createRecord).not.toHaveBeenCalled();
+        expect(getStatus(element).shadowRoot.textContent).not.toContain('REQUIRED_FIELD_MISSING');
+        expect(getStatus(element).shadowRoot.textContent).not.toContain('Record created successfully.');
     });
 
     it('shows an inline error when createRecord fails', async () => {
@@ -257,9 +236,6 @@ describe('c-guest-record-capture', () => {
         form.shadowRoot
             .querySelector('lightning-input')
             .dispatchEvent(new CustomEvent('change', { detail: { value: 'Trip 1' } }));
-        form.shadowRoot.querySelector('c-record-typeahead').dispatchEvent(
-            new CustomEvent('select', { detail: { id: FACTOR_ID, label: 'Factor One' } })
-        );
         await flushPromises();
 
         submitForm(form);

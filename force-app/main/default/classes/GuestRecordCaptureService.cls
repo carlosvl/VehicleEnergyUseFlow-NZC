@@ -118,6 +118,7 @@ public with sharing class GuestRecordCaptureService {
 
     /**
      * @description Inserts one target record. Extra keys are rejected; the parent lookup is set from parentId.
+     *              Parent-copied fields are taken from the parent record, not from the client.
      * @param configName Guest_Capture_Config__mdt developer name.
      * @param parentId Selected parent record Id (required).
      * @param values Field Set value map from the client.
@@ -139,7 +140,9 @@ public with sharing class GuestRecordCaptureService {
         );
         Set<String> allowedFields = toAllowedFieldNames(descriptors);
         Map<String, Object> incoming = values == null ? new Map<String, Object>() : new Map<String, Object>(values);
+        Map<String, String> parentCopiedFields = parseParentCopiedFields(config.Parent_Copied_Fields__c);
         rejectUnknownKeys(incoming.keySet(), allowedFields);
+        rejectParentCopiedKeys(incoming.keySet(), parentCopiedFields.keySet());
         applyDefaults(incoming, allowedFields, parseDefaultFieldValues(config.Default_Field_Values__c));
         SObject record = targetType.newSObject();
         Map<String, Schema.SObjectField> fieldTokens = targetType.getDescribe().fields.getMap();
@@ -152,6 +155,7 @@ public with sharing class GuestRecordCaptureService {
         }
         Schema.SObjectField parentField = requireField(targetType, config.Parent_Lookup_Field__c);
         record.put(parentField, parentId);
+        applyParentCopiedFields(record, searchType, targetType, parentId, parentCopiedFields);
         Database.insert(record, AccessLevel.USER_MODE);
         return record.Id;
     }
@@ -249,6 +253,45 @@ public with sharing class GuestRecordCaptureService {
         }
     }
 
+    private static void rejectParentCopiedKeys(Set<String> incomingKeys, Set<String> copiedTargets) {
+        for (String key : incomingKeys) {
+            if (containsIgnoreCase(copiedTargets, key)) {
+                throw new GuestRecordCaptureException('Field is not allowed: ' + key);
+            }
+        }
+    }
+
+    private void applyParentCopiedFields(
+        SObject record,
+        Schema.SObjectType searchType,
+        Schema.SObjectType targetType,
+        Id parentId,
+        Map<String, String> parentCopiedFields
+    ) {
+        if (parentCopiedFields == null || parentCopiedFields.isEmpty()) {
+            return;
+        }
+        SObject parent = sobjectSelector.selectById(
+            searchType,
+            parentId,
+            new List<String>(parentCopiedFields.values())
+        );
+        if (parent == null) {
+            throw new GuestRecordCaptureException('The selected asset was not found.');
+        }
+        for (String targetApiName : parentCopiedFields.keySet()) {
+            Schema.SObjectField targetToken = requireField(targetType, targetApiName);
+            Schema.SObjectField parentToken = requireField(searchType, parentCopiedFields.get(targetApiName));
+            Object parentValue = parent.get(parentToken);
+            if (isBlankValue(parentValue)) {
+                throw new GuestRecordCaptureException(
+                    'The selected asset has no value for ' + parentToken.getDescribe().getLabel() + '.'
+                );
+            }
+            record.put(targetToken, coerceValue(targetToken, parentValue));
+        }
+    }
+
     private static Boolean containsIgnoreCase(Set<String> allowedFields, String key) {
         if (allowedFields.contains(key)) {
             return true;
@@ -290,16 +333,41 @@ public with sharing class GuestRecordCaptureService {
         if (String.isBlank(jsonMap)) {
             return new Map<String, Object>();
         }
+        return parseJsonObject(jsonMap, 'Default field values');
+    }
+
+    private static Map<String, String> parseParentCopiedFields(String jsonMap) {
+        if (String.isBlank(jsonMap)) {
+            return new Map<String, String>();
+        }
+        Map<String, Object> parsed = parseJsonObject(jsonMap, 'Parent copied fields');
+        Map<String, String> copied = new Map<String, String>();
+        for (String targetApiName : parsed.keySet()) {
+            Object parentApiName = parsed.get(targetApiName);
+            if (String.isBlank(targetApiName) ||
+                !(parentApiName instanceof String) ||
+                String.isBlank((String) parentApiName)
+            ) {
+                throw new GuestRecordCaptureException(
+                    'Parent copied fields must map field API names to field API names.'
+                );
+            }
+            copied.put(targetApiName, (String) parentApiName);
+        }
+        return copied;
+    }
+
+    private static Map<String, Object> parseJsonObject(String jsonMap, String fieldLabel) {
         try {
             Object parsed = JSON.deserializeUntyped(jsonMap);
             if (parsed instanceof Map<String, Object>) {
                 return (Map<String, Object>) parsed;
             }
-            throw new GuestRecordCaptureException('Default field values must be a JSON object.');
+            throw new GuestRecordCaptureException(fieldLabel + ' must be a JSON object.');
         } catch (GuestRecordCaptureException e) {
             throw e;
         } catch (Exception e) {
-            throw new GuestRecordCaptureException('Default field values must be valid JSON.');
+            throw new GuestRecordCaptureException(fieldLabel + ' must be valid JSON.');
         }
     }
 

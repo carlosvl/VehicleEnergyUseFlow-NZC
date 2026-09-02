@@ -54,6 +54,7 @@ public class GuestRecordCaptureTestFactory {
             Min_Search_Length__c = 3,
             Result_Limit__c = 25,
             Default_Field_Values__c = '{"FuelEfficiencyUnit":"MILES_PER_GALLON"}',
+            Parent_Copied_Fields__c = '{"OtherEmssnFctrId":"OtherEmssnFctrId"}',
             Form_Title__c = 'Vehicle energy use',
             Parent_Search_Label__c = 'Vehicle asset',
             Submit_Label__c = 'Create energy use record'
@@ -76,6 +77,7 @@ public class GuestRecordCaptureTestFactory {
             Min_Search_Length__c = 3,
             Result_Limit__c = 25,
             Default_Field_Values__c = '{"FuelConsumptionUnit":"kWh"}',
+            Parent_Copied_Fields__c = '{"OtherEmssnFctrId":"OtherEmssnFctrId"}',
             Form_Title__c = 'Stationary energy use',
             Parent_Search_Label__c = 'Stationary asset',
             Submit_Label__c = 'Create energy use record'

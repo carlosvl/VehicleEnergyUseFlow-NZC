@@ -37,6 +37,10 @@ private class GuestCaptureConfigSelectorTest {
         Assert.areEqual('VehicleAssetEmssnSrcId', config.Parent_Lookup_Field__c);
         Assert.areEqual('Guest_Energy_Use_Capture', config.Field_Set_Name__c);
         Assert.isTrue(config.Default_Field_Values__c.contains('MILES_PER_GALLON'));
+        Assert.isTrue(
+            String.isNotBlank(config.Parent_Copied_Fields__c) &&
+            config.Parent_Copied_Fields__c.contains('OtherEmssnFctrId')
+        );
         Assert.areEqual('Vehicle energy use', config.Form_Title__c);
         Assert.areEqual('Vehicle asset', config.Parent_Search_Label__c);
         Assert.areEqual('Create energy use record', config.Submit_Label__c);
@@ -55,6 +59,10 @@ private class GuestCaptureConfigSelectorTest {
         Assert.areEqual('StnryAssetEnvrSrcId', config.Parent_Lookup_Field__c);
         Assert.areEqual('Guest_Energy_Use_Capture', config.Field_Set_Name__c);
         Assert.isTrue(config.Default_Field_Values__c.contains('kWh'));
+        Assert.isTrue(
+            String.isNotBlank(config.Parent_Copied_Fields__c) &&
+            config.Parent_Copied_Fields__c.contains('OtherEmssnFctrId')
+        );
         Assert.areEqual('Stationary energy use', config.Form_Title__c);
         Assert.areEqual('Stationary asset', config.Parent_Search_Label__c);
     }

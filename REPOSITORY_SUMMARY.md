@@ -1,6 +1,6 @@
 # Vehicle Asset Energy Use (NZC) — Repository Summary
 
-LLM-oriented inventory of this Salesforce DX accelerator. For how the solution works and the main caveats, read `wiki/index.md` first.
+LLM-oriented inventory of this Salesforce DX accelerator. For how the solution works and the main caveats, read `wiki/index.md` first. For what an administrator must configure in Setup after deploy, read `docs/admin-setup/README.md`.
 
 ## Overview
 
@@ -53,6 +53,7 @@ VehicleEnergyUseFlow-NZC/
 │   └── networkBranding/cbEUR_collection.*
 ├── manifest/package.xml
 ├── config/project-scratch-def.json
+├── docs/admin-setup/                         # Manual Setup after deploy
 ├── docs/open-source/                         # OSPO inventory and findings
 ├── wiki/index.md                             # synthesis
 ├── REPOSITORY_SUMMARY.md                     # this inventory
@@ -112,39 +113,40 @@ VehicleEnergyUseFlow-NZC/
 | `Min_Search_Length__c` | 3 | 3 |
 | `Result_Limit__c` | 25 | 25 |
 | `Default_Field_Values__c` | `{"FuelEfficiencyUnit":"MILES_PER_GALLON"}` | `{"FuelConsumptionUnit":"kWh"}` |
+| `Parent_Copied_Fields__c` | `{"OtherEmssnFctrId":"OtherEmssnFctrId"}` | `{"OtherEmssnFctrId":"OtherEmssnFctrId"}` |
 | `Form_Title__c` | Vehicle energy use | Stationary energy use |
 | `Parent_Search_Label__c` | Vehicle asset | Stationary asset |
 | `Submit_Label__c` | Create energy use record | Create energy use record |
 
-**Field Set** `Guest_Energy_Use_Capture` on `VehicleAssetEnrgyUse`: required `Name`, `OtherEmssnFctrId`, `FuelType`, `FuelConsumption`, `FuelConsumptionUnit`; optional `StartDate`, `EndDate`, `FuelEfficiency`, `FuelEfficiencyUnit`. Parent lookup is not a Field Set member.
+**Field Set** `Guest_Energy_Use_Capture` on `VehicleAssetEnrgyUse`: required `Name`, `FuelType`, `FuelConsumption`, `FuelConsumptionUnit`; optional `StartDate`, `EndDate`, `FuelEfficiency`, `FuelEfficiencyUnit`. Parent lookup and `OtherEmssnFctrId` are not Field Set members; Apex copies `OtherEmssnFctrId` from the parent asset.
 
-**Field Set** `Guest_Energy_Use_Capture` on `StnryAssetEnrgyUse`: required `Name`, `OtherEmssnFctrId`, `FuelType`, `FuelConsumption`, `FuelConsumptionUnit`; optional `StartDate`, `EndDate`. No fuel-efficiency fields. Parent lookup is not a Field Set member.
+**Field Set** `Guest_Energy_Use_Capture` on `StnryAssetEnrgyUse`: required `Name`, `FuelType`, `FuelConsumption`, `FuelConsumptionUnit`; optional `StartDate`, `EndDate`. No fuel-efficiency fields. Parent lookup and `OtherEmssnFctrId` are not Field Set members; Apex copies `OtherEmssnFctrId` from the parent asset.
 
-**Permission set** `Guest_Record_Capture`: Apex class access on `GuestRecordCaptureController`; Read `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, and `OtherEmssnFctrSet`; Create/Read `VehicleAssetEnrgyUse` and `StnryAssetEnrgyUse` plus FLS for capture fields (required `Name` / `FuelType` omitted). Assign to the EUR collection guest user after deploy.
+**Permission set** `Guest_Record_Capture`: Apex class access on `GuestRecordCaptureController`; Read `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, and `OtherEmssnFctrSet` (including parent `OtherEmssnFctrId` FLS); Create/Read `VehicleAssetEnrgyUse` and `StnryAssetEnrgyUse` plus FLS for capture fields (required `Name` / `FuelType` omitted). Assign to the EUR collection guest user after deploy **when the Guest User license includes Net Zero Cloud objects**. See `docs/admin-setup/README.md`.
 
 **Apex** (`force-app/main/default/classes/`)
 
 | Class | Role |
 | ---- | ---- |
 | `GuestRecordCaptureController` | Thin `@AuraEnabled` façade (`getConfig`, `searchRecords`, `getFormSchema`, `createRecord`) |
-| `GuestRecordCaptureService` | Config, search purpose (`parent` vs Field Set lookup API name), Field Set whitelist insert |
+| `GuestRecordCaptureService` | Config, search purpose (`parent` vs Field Set lookup API name), Field Set whitelist insert, parent-copied fields |
 | `GuestCaptureConfigSelector` | `Guest_Capture_Config__mdt` |
-| `GuestSObjectSelector` | Allowlisted `LIKE` search |
+| `GuestSObjectSelector` | Allowlisted `LIKE` search and parent `selectById` |
 | `FieldSetSchemaService` | Field Set → `FieldDescriptor` |
 | `GuestRecordCaptureDto` | `CaptureConfig` (includes form/parent/submit labels), `SearchResult`, `FieldDescriptor` |
 | `GuestRecordCaptureException` | Typed errors surfaced as `AuraHandledException` |
 
-`searchRecords` purpose: `"parent"` (or blank) searches the config search object. Any other purpose must be a Field Set lookup API name (for example `OtherEmssnFctrId` → `OtherEmssnFctrSet`). There is no `OtherEmssnFctr` object.
+`searchRecords` purpose: `"parent"` (or blank) searches the config search object. Any other purpose must be a Field Set lookup API name. Guest energy-use Field Sets do not include `OtherEmssnFctrId`; create copies it from the parent via `Parent_Copied_Fields__c`. There is no `OtherEmssnFctr` object.
 
 **LWC** (`force-app/main/default/lwc/`)
 
 | Bundle | Exposed | Role |
 | ---- | ---- | ---- |
 | `recordTypeahead` | no | Presentational combobox/listbox; parent debounces `search` and replaces `results` |
-| `dynamicFieldForm` | no | Renders FieldDescriptor rows; parent search is a sibling, not a form field |
+| `dynamicFieldForm` | no | Renders FieldDescriptor rows; parent search is a sibling, not a form field. Dispatches `capturesave` (not native `submit`) so LWR does not retarget the HTML form |
 | `inlineStatus` | no | Success/error/info region (no toasts) |
 | `guestRecordCaptureService` | no | JS-only wrappers for the Apex façade |
-| `guestRecordCapture` | yes | Composer for `lightningCommunity__Page` / `lightningCommunity__Default`; `@api configName` default `Vehicle_Energy_Use` |
+| `guestRecordCapture` | yes | Composer for `lightningCommunity__Page` / `lightningCommunity__Default`; `@api configName` default `Vehicle_Energy_Use`; listens for `capturesave` |
 
 Composer Jest mocks `c/guestRecordCaptureService` (does not call Apex). Primitive Jest tests use mock `@api` data.
 
@@ -177,14 +179,14 @@ Composer Jest mocks `c/guestRecordCaptureService` (does not call Apex). Primitiv
 
 Branding sets: `nZC.json` (scoped NZC), `buildYourOwnLWR.json`. Theme: `themes/buildYourOwnLWR.json`.
 
-**Not in this repo:** CustomSite `EUR_collection` (referenced by the Network as `<site>EUR_collection</site>`). Target orgs may need the Digital Experience created or published before Network deploy succeeds.
+**Not in this repo:** CustomSite `EUR_collection` (referenced by the Network as `<site>EUR_collection</site>`). Target orgs may need the Digital Experience created or published before Network deploy succeeds. Retrieved CustomSite XML includes org-specific usernames; do not commit it.
 
-Guest sharing rules are **not packaged**. After deploy, create guest user sharing for `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, `OtherEmssnFctrSet`, `VehicleAssetEnrgyUse`, and `StnryAssetEnrgyUse`, and assign `Guest_Record_Capture` to the site guest user.
+Guest sharing rules are **not packaged** and grant **Read only**. After deploy, create guest user sharing for `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, and `OtherEmssnFctrSet`. Assign `Guest_Record_Capture` when the license allows. Enable **Allow guest users to access public APIs** in site Preferences (not in metadata). Republish the site after LWC changes. Full checklist: `docs/admin-setup/README.md`.
 
 ### Adding the next object
 
-1. Field Set on the target object
-2. New `Guest_Capture_Config__mdt` row
+1. Field Set on the target object (omit parent lookup and parent-copied fields)
+2. New `Guest_Capture_Config__mdt` row (including optional `Parent_Copied_Fields__c`)
 3. FLS/CRUD + guest sharing for those objects
 4. Drop `c:guestRecordCapture` on a page with that `configName`
 
@@ -205,7 +207,7 @@ VehicleAssetEmssnSrc  1──*  VehicleAssetEnrgyUse  *──1  OtherEmssnFctrSe
         └── VehicleAssetCrbnFtprnt (downstream, not written by this flow)
 ```
 
-`OtherEmssnFctrId` on `VehicleAssetEnrgyUse` looks up **Other Emissions Factor Set** (`OtherEmssnFctrSet`). There is no `OtherEmssnFctr` object.
+`OtherEmssnFctrId` on energy-use records looks up **Other Emissions Factor Set** (`OtherEmssnFctrSet`). There is no `OtherEmssnFctr` object. Parent assets (`VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`) have the same lookup; guest create copies that value onto the child.
 
 ```
 StnryAssetEnvrSrc  1──*  StnryAssetEnrgyUse  *──1  OtherEmssnFctrSet
@@ -227,7 +229,7 @@ This org model does not include Fugitive or Process asset objects.
 
 Prerequisite: Net Zero Cloud licensed; Digital Experiences enabled for site metadata.
 
-After deploy: map Lightning record page `recordId` → flow `RecordID`; publish EUR collection; assign real profiles; set site sender email; grant FLS/CRUD on vehicle and stationary energy-use objects to site users; assign `Guest_Record_Capture` to the guest user; create guest sharing rules; keep `/eur-lwc` public.
+After deploy, complete **manual Setup** in `docs/admin-setup/README.md`: map Lightning record page `recordId` → flow `RecordID`; publish EUR collection (again after every LWC change); assign real profiles; set site sender email; enable **Allow guest users to access public APIs**; grant FLS/CRUD to site users whose license includes Net Zero Cloud; assign `Guest_Record_Capture` when the guest license allows; create **Read-only** guest sharing on parent assets and factor sets; keep `/eur-lwc` public. Guest User licenses often cannot CRUD Net Zero Cloud objects.
 
 `config/project-scratch-def.json` is Developer Edition + `Communities`. Net Zero Cloud is typically **not** available on scratch orgs.
 
@@ -246,9 +248,10 @@ After deploy: map Lightning record page `recordId` → flow `RecordID`; publish 
 - Guest Apex never accepts raw object API names from the client; objects come from `Guest_Capture_Config__mdt`
 - Create payload: keys not in the Field Set are rejected; parent Id is required and must match the config search object
 - SOQL/DML use `USER_MODE` (sharing + FLS of the running guest or community user)
-- Guest sharing rules remain org setup and are not in source
+- Guest sharing rules remain org setup and are not in source (Read only; create is object permission)
+- **Allow guest users to access public APIs** is site Preferences, not metadata; do not enable guest **API Enabled**
 - No hardcoded credentials (site sender is a placeholder address)
-- LWCs: no `innerHTML`; presentational primitives do not import Apex
+- LWCs: no `innerHTML`; presentational primitives do not import Apex; form save is `capturesave`, not native `submit`
 - Locker Service enabled on the LWR app page (`isLockerServiceEnabled: true`)
 - Apex and LWC files include Salesforce copyright / Apache-2.0 headers
 
@@ -267,5 +270,6 @@ After deploy: map Lightning record page `recordId` → flow `RecordID`; publish 
 
 - `README.md` — install, usage, architecture diagram
 - `wiki/index.md` — how it works and caveats
+- `docs/admin-setup/README.md` — manual administrator Setup after deploy
 - `docs/open-source/OPEN_SOURCE_DEPENDENCIES.md` — 3PP / platform inventory
 - `docs/open-source/COMPLIANCE_FINDINGS.md` — OSPO / quality findings

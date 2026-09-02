@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <FieldSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Guest_Energy_Use_Capture</fullName>
-    <description>Guest Experience Cloud capture fields for Vehicle Asset Energy Use. Parent lookup is set in Apex, not in this Field Set.</description>
+    <description>Guest Experience Cloud capture fields for Vehicle Asset Energy Use. Parent lookup and OtherEmssnFctrId are set in Apex from the parent asset, not in this Field Set.</description>
     <displayedFields>
         <field>Name</field>
-        <isFieldManaged>false</isFieldManaged>
-        <isRequired>true</isRequired>
-    </displayedFields>
-    <displayedFields>
-        <field>OtherEmssnFctrId</field>
         <isFieldManaged>false</isFieldManaged>
         <isRequired>true</isRequired>
     </displayedFields>

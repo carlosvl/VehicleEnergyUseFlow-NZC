@@ -8,21 +8,23 @@ Generated 2026-08-31 while applying OSPO compliance, repository shape, and Sales
 | ---- | ---- |
 | Employee email in Network `emailSenderAddress` | Replaced with `noreply@example.com` |
 | Experience Home referenced `NZC_Create_EUR_for_Stationary` (not in repo) | Pointed at `Vehicle_Asset_Energy_Use` |
-| EUR-lwc referenced `c:billIngestorGuest` (companion accelerator) | Replaced with in-repo vehicle flow |
+| EUR-lwc referenced `c:billIngestorGuest` (companion accelerator) | Replaced with in-repo Guest Record Capture (`Vehicle_Energy_Use` and `Stationary_Energy_Use`) |
 | Missing Apache 2.0 governance set | Added `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `CODEOWNERS` (`LICENSE.txt` already present) |
 | `package.json` had no SPDX license | Set `"license": "Apache-2.0"` |
 | `sourceApiVersion` was `55.0` (Spring '22) | Bumped to `64.0` |
 | Flow `apiVersion` was `56.0` (SFCA High: AvoidOldSalesforceApiVersions) | Bumped to `64.0` |
 | Flow had no description | Added `<description>` on `Vehicle_Asset_Energy_Use` |
 | No LLM inventory / wiki | Added `REPOSITORY_SUMMARY.md` and `wiki/index.md` |
+| Apex/LWC copyright headers | Guest capture Apex and LWC files include Salesforce copyright / Apache-2.0 headers |
 
 ## Remaining (non-blocking unless noted)
 
 | Item | Severity | Notes |
 | ---- | ---- | ---- |
-| Network member profile `nzc partner user` | Medium | Org-specific. Create it or remap membership after deploy |
-| CustomSite `EUR_collection` not in source | Medium | Network references it. Enable Digital Experiences and publish/create the site if deploy fails |
-| No Apex/LWC copyright headers | Info | No Apex, LWC, CSS, or Aura source exists to stamp |
+| Network member profile `nzc partner user` | Medium | Org-specific. Create it or remap membership after deploy. See `docs/admin-setup/README.md` |
+| CustomSite `EUR_collection` not in source | Medium | Network references it. Enable Digital Experiences and publish/create the site if deploy fails. Do not commit retrieved CustomSite XML (org usernames) |
+| Guest public APIs / sharing / license | Medium | Not packaged. Admins must enable **Allow guest users to access public APIs**, create Read-only guest sharing, and handle Guest User license limits on Net Zero Cloud objects |
+| Classic ExperienceBundle vs enhanced LWR | Medium | Repo ships Picasso ExperienceBundle. Enhanced LWR sites cannot overlay it; place LWCs in Builder |
 | Salesforce Code Analyzer | Partial | Ran `sf code-analyzer run --workspace force-app`. Regex High on old Flow API **fixed**. Flow engine did not start (Python 3.10+ missing). Re-run locally with Python so the Flow Scanner can evaluate `Vehicle_Asset_Energy_Use` |
 | GitHub Discussions disabled | Info | Issues tab is enabled. Enable Discussions if you want that support channel |
 | GitHub license detection showed `Other` | Info | Full ALv2 is in `LICENSE.txt`; confirm GitHub detects Apache-2.0 after this commit |
@@ -34,7 +36,7 @@ Generated 2026-08-31 while applying OSPO compliance, repository shape, and Sales
 - Internal hosts (`*.sfdc.sh`, `git.soma.salesforce.com`)
 - Internal CI names (GUS, Grand Slam, Jenkins) in published source
 - Hardcoded credentials, tokens, or API keys
-- SOQL injection or DML-in-loop (no Apex)
+- SOQL injection or DML-in-loop in guest capture Apex (USER_MODE; objects from CMDT allowlist)
 - Private npm packages
 
 ## Approvals

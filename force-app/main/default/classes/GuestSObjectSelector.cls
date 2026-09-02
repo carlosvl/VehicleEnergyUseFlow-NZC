@@ -7,7 +7,7 @@
  */
 
 /**
- * @description Generic USER_MODE search against an already-allowlisted SObject type.
+ * @description Generic USER_MODE query against an already-allowlisted SObject type.
  *              Object and field API names are taken from describe tokens, never from raw client input.
  */
 public inherited sharing virtual class GuestSObjectSelector {
@@ -48,6 +48,49 @@ public inherited sharing virtual class GuestSObjectSelector {
             fieldName +
             ' LIMIT :queryLimit';
         return Database.query(soql, AccessLevel.USER_MODE);
+    }
+
+    /**
+     * @description Loads one record by Id with an allowlisted field list. Always includes Id.
+     * @param sobjectType Allowlisted SObject token from capture config.
+     * @param recordId Record Id to load.
+     * @param fieldApiNames Additional fields to select (validated against describe).
+     * @return Matching row, or null when none is visible.
+     */
+    public virtual SObject selectById(
+        Schema.SObjectType sobjectType,
+        Id recordId,
+        List<String> fieldApiNames
+    ) {
+        if (sobjectType == null) {
+            throw new GuestRecordCaptureException('A search object is required.');
+        }
+        if (recordId == null) {
+            throw new GuestRecordCaptureException('Parent Id is required.');
+        }
+        Schema.DescribeSObjectResult objectDescribe = sobjectType.getDescribe();
+        Set<String> qualified = new Set<String>{ 'Id' };
+        if (fieldApiNames != null) {
+            for (String fieldApiName : fieldApiNames) {
+                if (String.isBlank(fieldApiName)) {
+                    continue;
+                }
+                Schema.SObjectField token = objectDescribe.fields.getMap().get(fieldApiName);
+                if (token == null) {
+                    throw new GuestRecordCaptureException('Unknown field in capture config.');
+                }
+                qualified.add(token.getDescribe().getName());
+            }
+        }
+        String objectName = objectDescribe.getName();
+        String soql =
+            'SELECT ' +
+            String.join(new List<String>(qualified), ', ') +
+            ' FROM ' +
+            objectName +
+            ' WHERE Id = :recordId LIMIT 1';
+        List<SObject> rows = Database.query(soql, AccessLevel.USER_MODE);
+        return rows.isEmpty() ? null : rows[0];
     }
 
     private static String sanitizeLikeTerm(String term) {

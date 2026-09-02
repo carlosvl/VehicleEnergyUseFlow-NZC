@@ -1,13 +1,14 @@
 {
   "project": "VehicleEnergyUseFlow-NZC",
   "license": "Apache-2.0",
-  "generated": "2026-08-31",
+  "generated": "2026-09-02",
   "runtime": [
     {
       "name": "Salesforce Platform",
       "kind": "platform",
       "required": true,
-      "deployedWithThisRepo": false
+      "deployedWithThisRepo": false,
+      "notes": "Includes Apex runtime for guest capture classes in this repo"
     },
     {
       "name": "Net Zero Cloud",
@@ -20,7 +21,7 @@
       "name": "Experience Cloud",
       "kind": "platform-feature",
       "required": false,
-      "notes": "Required only to deploy Network / ExperienceBundle / NetworkBranding",
+      "notes": "Required only to deploy Network / ExperienceBundle / NetworkBranding. Guest LWC also needs site Preference Allow guest users to access public APIs (not in metadata).",
       "deployedWithThisRepo": false
     }
   ],

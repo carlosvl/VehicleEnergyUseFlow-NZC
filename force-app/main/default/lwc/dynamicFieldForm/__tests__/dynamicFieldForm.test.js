@@ -108,12 +108,12 @@ describe('c-dynamic-field-form', () => {
         expect(lastValues.IsActive).toBe(true);
     });
 
-    it('does not fire submit when required fields are empty', async () => {
+    it('does not fire capturesave when required fields are empty', async () => {
         const element = createForm({
             fields: [{ apiName: 'Name', label: 'Name', type: 'STRING', required: true }]
         });
         const handler = jest.fn();
-        element.addEventListener('submit', handler);
+        element.addEventListener('capturesave', handler);
 
         submitForm(element);
         await flushPromises();
@@ -121,12 +121,12 @@ describe('c-dynamic-field-form', () => {
         expect(handler).not.toHaveBeenCalled();
     });
 
-    it('fires submit with the values map when required fields are filled', async () => {
+    it('fires capturesave with the values map when required fields are filled', async () => {
         const element = createForm({
             fields: [{ apiName: 'Name', label: 'Name', type: 'STRING', required: true }]
         });
         const handler = jest.fn();
-        element.addEventListener('submit', handler);
+        element.addEventListener('capturesave', handler);
 
         const input = element.shadowRoot.querySelector('lightning-input');
         input.dispatchEvent(new CustomEvent('change', { detail: { value: 'Trip 1' } }));
@@ -194,7 +194,7 @@ describe('c-dynamic-field-form', () => {
         expect(options[0].textContent).toContain('Factor One');
     });
 
-    it('does not fire submit when a required reference field is empty', async () => {
+    it('does not fire capturesave when a required reference field is empty', async () => {
         const element = createForm({
             fields: [
                 {
@@ -206,7 +206,7 @@ describe('c-dynamic-field-form', () => {
             ]
         });
         const handler = jest.fn();
-        element.addEventListener('submit', handler);
+        element.addEventListener('capturesave', handler);
 
         submitForm(element);
         await flushPromises();

@@ -38,7 +38,7 @@
 ### 🏗️ **Net Zero Cloud Integration**
 
 - **Standard Objects Only**: Writes to Net Zero Cloud vehicle energy-use objects — no custom objects required
-- **Emissions Factor Lookup**: Requires an Other Emissions Factor on each submission so carbon accounting can proceed downstream
+- **Emissions Factor**: The internal flow collects Other Emissions Factor Set on each submission. Guest capture copies that lookup from the selected parent asset so carbon accounting can proceed downstream
 - **Stationary Counterpart**: Complements the managed **Collect Energy Use Data** flow that ships with Net Zero Cloud for Stationary Assets
 
 ---
@@ -113,40 +113,21 @@ sfdx force:source:deploy -p force-app -u MyOrg
 
 #### ⚡ Post-Deployment Configuration
 
-After deploying with any method above, complete these manual steps:
+Deploying metadata does **not** finish the install. Sharing, guest APIs, Lightning page mapping, site publish, and licenses are **admin Setup**. Use the full checklist in **[docs/admin-setup/README.md](docs/admin-setup/README.md)**. Summary:
 
-1. **Confirm Net Zero Cloud Objects**
-   - Verify **Vehicle Asset Emission Source** and **Vehicle Asset Energy Use** are visible in your org
-   - Create or confirm **Other Emissions Factor** records so the flow lookup has values
+1. **Confirm Net Zero Cloud objects** and create **Other Emissions Factor Set** records (`OtherEmssnFctrSet`; there is no Other Emissions Factor object). Set `OtherEmssnFctrId` on every parent asset guests may select.
 
-2. **Add the Flow to the Vehicle Asset Emission Source Page**
-   - Open a Vehicle Asset Emission Source record → **Edit Page**
-   - Add a **Flow** component and select `Vehicle Asset Energy Use`
-   - Map the page **record ID** to the flow input variable `RecordID` (the name is case-sensitive)
-   - Save and activate the page
+2. **Add the flow** to the Vehicle Asset Emission Source Lightning page. Map the page record Id to flow input **`RecordID`** (case-sensitive).
 
-3. **Enable and Publish Digital Experiences**
-   - Setup → **Digital Experiences** → **Settings** → enable Digital Experiences if needed
-   - Open **Experience Workspaces** for **EUR collection**
-   - Set the site **email sender** to a verified address in your org (source uses a placeholder)
-   - Assign member profiles that exist in your org (the retrieved network includes Admin and a partner profile named `nzc partner user`, which you may need to create or replace)
-   - **Publish** the site
+3. **Enable Digital Experiences**, set a verified **email sender**, remap Network member profiles (`nzc partner user` is org-specific), keep **EUR-lwc** public, and **publish** the site. After any later LWC deploy, publish again (`sf community publish --name "EUR collection"`) or guests keep stale webruntime JavaScript.
 
-4. **Grant Object Access to Site Users**
-   - Give community or partner users Read on Vehicle Asset Emission Source
-   - Give Create and Read on Vehicle Asset Energy Use, including field-level access for fuel, date, and emissions factor fields
+4. **Guest public APIs** — Experience Workspaces → Administration → Preferences → **Allow guest users to access public APIs**. This is not in source. Leave guest profile **API Enabled** unchecked.
 
-5. **Configure Guest Capture (EUR-lwc)**
-   - Assign the **Guest Record Capture** permission set (`Guest_Record_Capture`) to the EUR collection **guest user**
-   - Create **guest user sharing rules** for Read on `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, and `OtherEmssnFctrSet`, and sharing that allows Create/Read on `VehicleAssetEnrgyUse` and `StnryAssetEnrgyUse` (guest sharing is org setup and is not in this package)
-   - Confirm **EUR-lwc** is a **public** page (`/eur-lwc`) so guests can open it without signing in
-   - Other Emissions Factor searches **Other Emissions Factor Set** (`OtherEmssnFctrSet`); there is no Other Emissions Factor object
+5. **Guest access** — assign `Guest_Record_Capture` when the Guest User license includes Net Zero Cloud objects. Create **guest user sharing rules (Read only)** on `VehicleAssetEmssnSrc`, `StnryAssetEnvrSrc`, and `OtherEmssnFctrSet`. Create on energy-use objects is object permission, not sharing. Many Guest User licenses cannot CRUD these objects; then grant Apex + CMDT on the guest profile and use authenticated members for capture.
 
-6. **Verify the Site**
-   - Home runs `Vehicle_Asset_Energy_Use` for authenticated members
-   - **EUR-lwc** (`/eur-lwc`) runs Guest Record Capture with configs `Vehicle_Energy_Use` and `Stationary_Energy_Use`
-   - Optionally add the companion [NZC LLM Bill Ingestor](https://github.com/carlosvl/NZC-LLM-Bill-Ingestor) if you want bill upload
-   - Follow the [Usage instructions](#-usage) below to capture your first vehicle energy use record
+6. **Verify** Home (signed-in flow), public `/eur-lwc` (two Guest Record Capture cards), and that guest submit does not flash `REQUIRED_FIELD_MISSING`. If the org already has enhanced LWR, place the LWCs in Experience Builder instead of overlaying the repo ExperienceBundle.
+
+Optionally add the companion [NZC LLM Bill Ingestor](https://github.com/carlosvl/NZC-LLM-Bill-Ingestor) on a different page. This site does not reference it.
 
 ---
 
@@ -174,15 +155,15 @@ After deploying with any method above, complete these manual steps:
 1. **Open** the public `/eur-lwc` page (no sign-in)
 2. **Choose** the Vehicle energy use or Stationary energy use card
 3. **Search** for the matching parent asset (at least 3 characters)
-4. **Fill** Name, Other Emissions Factor, fuel type, consumption, and unit (dates are optional; vehicle also has optional efficiency)
+4. **Fill** Name, fuel type, consumption, and unit (dates are optional; vehicle also has optional efficiency). Other Emissions Factor is copied from the asset.
 5. **Submit** to create the energy use record linked to that asset
 
 ### ➕ **Add Another Capture Object**
 
 The guest composer is reused; vehicle is a config row, not a forked UI.
 
-1. Add a Field Set on the target object (do not put the parent lookup in the Field Set)
-2. Add a `Guest_Capture_Config__mdt` row for search object, target object, parent lookup, Field Set, defaults, and card labels
+1. Add a Field Set on the target object (do not put the parent lookup or parent-copied fields in the Field Set)
+2. Add a `Guest_Capture_Config__mdt` row for search object, target object, parent lookup, Field Set, defaults, optional parent-copied JSON, and card labels
 3. Grant FLS/CRUD and guest sharing for those objects
 4. Place **Guest Record Capture** on a page and set the Capture Config developer name
 
@@ -190,7 +171,7 @@ The guest composer is reused; vehicle is a config row, not a forked UI.
 
 - **Name**: Record name for the energy use entry
 - **Vehicle Asset Emission Source**: Parent vehicle asset (`VehicleAssetEmssnSrcId`)
-- **Other Emissions Factor**: Factor used for downstream carbon calculation
+- **Other Emissions Factor**: Copied from the parent asset on guest create; collected in the internal flow
 - **Fuel Type, Consumption, and Unit**: Required fuel usage
 - **Start Date and End Date**: Optional reporting period
 - **Fuel Efficiency and Unit**: Optional efficiency (unit defaults to `MILES_PER_GALLON`)
@@ -234,15 +215,15 @@ graph TB
 | Component | Description |
 | ---- | ---- |
 | `Vehicle_Asset_Energy_Use` | Screen flow that looks up a Vehicle Asset Emission Source and creates a Vehicle Asset Energy Use record |
-| Guest Record Capture | Exposed Experience Cloud LWC; `@api configName` default `Vehicle_Energy_Use` |
-| `Guest_Record_Capture` | Permission set for guest Apex, CRUD, and FLS — assign to the site guest user |
-| `Guest_Capture_Config__mdt` | Allowlist config (search object, target object, Field Set, defaults, card labels) |
+| Guest Record Capture | Exposed Experience Cloud LWC; `@api configName` default `Vehicle_Energy_Use`. Form save uses `capturesave`, not native `submit`. |
+| `Guest_Record_Capture` | Permission set for guest Apex, CRUD, and FLS — assign to the site guest user when the license allows |
+| `Guest_Capture_Config__mdt` | Allowlist config (search object, target object, Field Set, defaults, parent-copied fields, card labels) |
 | `EUR collection` | Experience Cloud LWR site; Home = vehicle flow, `/eur-lwc` = guest LWC (vehicle + stationary) |
 | `VehicleAssetEmssnSrc` | Net Zero Cloud Vehicle Asset Emission Source — parent record |
 | `VehicleAssetEnrgyUse` | Net Zero Cloud Vehicle Asset Energy Use — record created by the flow or guest LWC |
 | `StnryAssetEnvrSrc` | Net Zero Cloud Stationary Asset Environmental Source — parent record |
 | `StnryAssetEnrgyUse` | Net Zero Cloud Stationary Asset Energy Use — record created by the guest LWC |
-| `OtherEmssnFctrId` | Required lookup to Other Emissions Factor Set (`OtherEmssnFctrSet`) |
+| `OtherEmssnFctrId` | Lookup to Other Emissions Factor Set (`OtherEmssnFctrSet`). Guest Apex copies it from the parent asset. |
 
 ---
 
@@ -262,7 +243,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide, including the Salesfo
 
 - Follow [Salesforce coding standards](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_best_practices.htm)
 - Include comprehensive test coverage (>75%) for any Apex you add
-- Update documentation for new features (`README.md`, `wiki/index.md`, `REPOSITORY_SUMMARY.md`)
+- Update documentation for new features (`README.md`, `wiki/index.md`, `docs/admin-setup/README.md`, `REPOSITORY_SUMMARY.md`)
 - Test thoroughly in multiple org types (Sandbox, Developer Edition)
 - Keep Experience Cloud page components aligned with metadata that actually ships in this package
 
@@ -283,12 +264,12 @@ When reporting bugs, please include:
 - Steps to reproduce the issue
 - Expected vs. actual behavior
 - Salesforce org version and edition
-- Whether Digital Experiences was enabled before deploy
+- Whether Digital Experiences was enabled before deploy, and whether the site was republished after LWC changes
 - Screenshots or error messages (if applicable)
 
 ## 🆘 Support
 
-- 📚 **Documentation**: Start with [wiki/index.md](wiki/index.md) and [REPOSITORY_SUMMARY.md](REPOSITORY_SUMMARY.md)
+- 📚 **Documentation**: [wiki/index.md](wiki/index.md) (how it works), [docs/admin-setup/README.md](docs/admin-setup/README.md) (manual Setup), [REPOSITORY_SUMMARY.md](REPOSITORY_SUMMARY.md) (inventory)
 - 🐛 **Issues**: Report bugs via [GitHub Issues](https://github.com/carlosvl/VehicleEnergyUseFlow-NZC/issues)
 - 🔒 **Security**: Report vulnerabilities via [SECURITY.md](SECURITY.md)
 - 🤝 **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)

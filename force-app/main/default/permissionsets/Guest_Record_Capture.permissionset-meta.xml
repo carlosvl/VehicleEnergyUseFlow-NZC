@@ -8,7 +8,12 @@
         <enabled>true</enabled>
         <name>Guest_Capture_Config__mdt</name>
     </customMetadataTypeAccesses>
-    <description>Apex, CRUD, and FLS for Experience Cloud guest capture. Assign to the site guest user. OtherEmssnFctrId looks up OtherEmssnFctrSet. Required Name and FuelType are omitted from fieldPermissions.</description>
+    <description>Apex, CRUD, and FLS for Experience Cloud guest capture. Assign to the site guest user. OtherEmssnFctrId is copied from the parent asset in Apex. Required Name and FuelType are omitted from fieldPermissions.</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>StnryAssetEnvrSrc.OtherEmssnFctrId</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>StnryAssetEnrgyUse.EndDate</field>
@@ -32,6 +37,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>StnryAssetEnrgyUse.StartDate</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>VehicleAssetEmssnSrc.OtherEmssnFctrId</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

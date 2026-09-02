@@ -2,15 +2,15 @@
 
 Inventory of runtime and development dependencies for Vehicle Asset Energy Use (NZC).
 
-This accelerator is Salesforce metadata. It has **no Apex, LWC, or npm runtime** in the deployed package. npm packages below are **dev-only** (lint/format/Jest scaffolding).
+This accelerator is Salesforce metadata. Deployed runtime includes **Apex** and **Lightning web components** in this repository plus platform and Net Zero Cloud. npm packages below are **dev-only** (lint/format/Jest scaffolding).
 
 ## Runtime (Salesforce)
 
 | Name | Type | License / source | Required | Notes |
 | ---- | ---- | ---- | ---- | ---- |
-| Salesforce Platform | PaaS | Salesforce subscription | Yes | Flows, Experience Cloud, Metadata API |
+| Salesforce Platform | PaaS | Salesforce subscription | Yes | Flows, Experience Cloud, Metadata API, Apex |
 | Net Zero Cloud (`sustainability`) | Managed package | Salesforce product license | Yes | Provides `VehicleAssetEmssnSrc`, `VehicleAssetEnrgyUse`, `StnryAssetEnvrSrc`, `StnryAssetEnrgyUse`, Other Emissions Factor Set |
-| Experience Cloud / Digital Experiences | Platform feature | Salesforce subscription | For site only | LWR `talon-template-byo`, `dxp_flow:flow` |
+| Experience Cloud / Digital Experiences | Platform feature | Salesforce subscription | For site only | LWR `talon-template-byo`, `dxp_flow:flow`; guest capture also needs site Preferences **Allow guest users to access public APIs** (not in metadata) |
 | Collect Energy Use Data | Managed flow | Net Zero Cloud | No | Stationary counterpart; not in this repo |
 
 ## Development (npm)

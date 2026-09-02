@@ -148,6 +148,7 @@ export default class DynamicFieldForm extends LightningElement {
 
     handleSubmit(event) {
         event.preventDefault();
+        event.stopPropagation();
         if (this.disabled) {
             return;
         }
@@ -185,7 +186,7 @@ export default class DynamicFieldForm extends LightningElement {
         }
 
         this.dispatchEvent(
-            new CustomEvent('submit', {
+            new CustomEvent('capturesave', {
                 detail: { values: this.exportValues() }
             })
         );
